@@ -2,7 +2,7 @@ machine:
   java:
     version: oraclejdk8
   services:
-    # No services
+    - docker
 dependencies:
   override:
     # Prevent CircleCI from automatically installing gradle deps since we'll use gradlew instead
@@ -12,14 +12,13 @@ dependencies:
 test:
   override:
   - ./gradlew check
+  - ./gradlew fatJar
 deployment:
   production: # just a label; label names are completely up to you
     branch: master
     commands:
-      - ./gradlew fatJar
       - ./deploy_docker.sh
   staging:
     branch: /.*/
     commands:
-      - ./gradlew fatJar
       - ./deploy_docker.sh

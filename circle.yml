@@ -22,11 +22,11 @@ deployment:
     branch: master
     commands:
       - ./gradlew fatJar
-      - sudo pip install boto==2.34.0
+      #- sudo pip install boto==2.34.0
       #- ./deploy.sh
   staging:
     branch: /.*/
     commands:
       - ./gradlew fatJar
-      - sudo pip install boto==2.34.0
+      #- sudo pip install boto==2.34.0
       #- ./deploy.sh

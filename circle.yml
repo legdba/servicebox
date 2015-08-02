@@ -5,11 +5,11 @@ machine:
     - docker
 dependencies:
   # Prevent CircleCI from automatically installing gradle deps since we'll use gradlew instead
-  #override:
+  override:
     # Enable Gradle daemon to speedup all gradle command after the 1st one
-    #- echo "org.gradle.daemon=true" > ~/.gradle/gradle.properties
+    - echo "org.gradle.daemon=true" > ~/.gradle/gradle.properties
     # Now donwload Gradlew if that is the 1st time we build this repo (will be cached, see cache_directories)
-    #- ./gradlew
+    - ./gradlew
   #cache_directories:
     #- ~/.gradle
     #- ~/.m2

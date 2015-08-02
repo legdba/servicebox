@@ -2,20 +2,13 @@ machine:
   java:
     version: oraclejdk8
   services:
-    - docker
+    # No services
 dependencies:
-  # Prevent CircleCI from automatically installing gradle deps since we'll use gradlew instead
   override:
-    # Enable Gradle daemon to speedup all gradle command after the 1st one
-    - echo "org.gradle.daemon=true" > ~/.gradle/gradle.properties
-    # Now donwload Gradlew if that is the 1st time we build this repo (will be cached, see cache_directories)
-    - ./gradlew
+    # Prevent CircleCI from automatically installing gradle deps since we'll use gradlew instead
   cache_directories:
     # Cache gradlew binaries
     - ~/.gradle/wrapper
-    #- ~/.gradle
-    #- ~/.m2
-    # TODO: find how to cache docker AUFS layers to speed builds up
 test:
   override:
   - ./gradlew check
@@ -24,11 +17,7 @@ deployment:
     branch: master
     commands:
       - ./gradlew fatJar
-      #- sudo pip install boto==2.34.0
-      #- ./deploy.sh
   staging:
     branch: /.*/
     commands:
       - ./gradlew fatJar
-      #- sudo pip install boto==2.34.0
-      #- ./deploy.sh

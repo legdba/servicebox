@@ -82,6 +82,8 @@ task fatJar(type: Jar) {
     with jar
 }
 
-task version(type:DefaultTask) {
-    println version
+task buildInfo() {
+    println "version : " + version
+    println "appname : " + project.name
+    println "fatjar  : " + project.name + '-all-' + version + '.jar'
 }

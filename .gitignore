@@ -1,0 +1,6 @@
+target
+.gradle
+build
+gradle-app.setting
+*.ipr
+*.iws

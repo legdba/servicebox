@@ -1,0 +1,90 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+ext.revision = 'git rev-list --count HEAD'.execute().text.trim()
+ext.hash = 'git rev-parse --short HEAD'.execute().text.trim()
+ext.branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+if (ext.branch == 'master') { ext.branch = '' } else { ext.branch = '-' + ext.branch }
+group = 'com.brimarx'
+version = "r${revision}-${hash}${ext.branch}"
+description = """REST services for demo and test purpose."""
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// Gradle Wrapper for predictible builds
+// See http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+              url "http://www.brimarx.com:8081/nexus/content/groups/public"
+        }
+}
+
+dependencies {
+    compile     'org.slf4j:slf4j-api:1.7.+',
+                'ch.qos.logback:logback-classic:1.1.+',
+                'org.glassfish.jersey.core:jersey-server:2.+',
+                'org.glassfish.jersey.containers:jersey-container-servlet:2.+',
+                'org.eclipse.jetty:jetty-server:9.2.3.v20140905',
+                'org.eclipse.jetty:jetty-servlet:9.2.3.v20140905',
+                'commons-cli:commons-cli:1.2'
+                
+    testCompile 'org.testng:testng:6.+',
+                'org.uncommons:reportng:1.1.4',
+                // workaround for a known issue with TestNG 6.x: explicitly add Guice (Gradle will fail to run tests otherwise)
+                'com.google.inject:guice:3.0'
+}
+
+// ensure that test resources (src/test/resources) are added to CLASSPATH;
+// see http://forums.gradle.org/gradle/topics/tests_arent_executed_when_setting_the_test_runtimeclasspath and
+// http://gradle.org/docs/current/dsl/org.gradle.api.tasks.testing.Test.html#org.gradle.api.tasks.testing.Test:classpath
+sourceSets {
+  main {
+    runtimeClasspath = files(output.resourcesDir) + runtimeClasspath
+  }
+  test {
+    runtimeClasspath = files(output.resourcesDir) + runtimeClasspath
+  }
+}
+
+test {
+  useTestNG() {
+    suiteXmlBuilder().suite(name: 'gradle-testng-mockito-bootstrap', parallel: 'tests') {
+      test (name : 'all-tests') {
+        packages {
+          'package' (name: 'com.brimarx.*')
+        }
+      }
+    }
+  }
+  options {
+    listeners << 'org.uncommons.reportng.HTMLReporter'
+    listeners << 'org.uncommons.reportng.JUnitXMLReporter'
+  }
+  ext.useDefaultListeners = true
+  ext.workingDirectory = 'build/'
+}
+
+mainClassName = 'com.brimarx.servicebox.EmbededServer'
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',  
+                   'Implementation-Version': version,
+                   'Main-Class': mainClassName
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task version(type:DefaultTask) {
+    println version
+}

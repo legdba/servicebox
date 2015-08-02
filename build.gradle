@@ -16,14 +16,11 @@ targetCompatibility = 1.8
 // Gradle Wrapper for predictible builds
 // See http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+    gradleVersion = '2.5'
 }
 
 repositories {
     mavenCentral()
-    maven {
-              url "http://www.brimarx.com:8081/nexus/content/groups/public"
-        }
 }
 
 dependencies {

@@ -17,7 +17,9 @@ deployment:
     branch: master
     commands:
       - ./gradlew fatJar
+      - ./deploy_docker.sh
   staging:
     branch: /.*/
     commands:
       - ./gradlew fatJar
+      - ./deploy_docker.sh

@@ -44,6 +44,8 @@ run() {
 ###############################################################################
 # Check required variable
 ###############################################################################
+echo
+echo "=== checking environment ==="
 
 # Check the env contains the Docker repo to push Docker image to
 # use "quai.io" for quay.io
@@ -78,6 +80,8 @@ fi
 ###############################################################################
 # Set all variables
 ###############################################################################
+echo
+echo "=== collecting facts ==="
 if [ -n "$CIRCLECI" ]
 then
     export ARTIFACTS_PATH=./build/libs
@@ -108,6 +112,8 @@ ls $ARTIFACTS_PATH
 ###############################################################################
 # Check JAR File exists and is valid, plus generate sha1
 ###############################################################################
+echo
+echo "=== checking artifacts ==="
 if [ ! -f $ARTIFACTS_PATH/$ARTIFACT ]
 then
     echo file not found: $ARTIFACTS_PATH/$ARTIFACT
@@ -161,6 +167,6 @@ then
     exe "docker push $DOCKER_IMAGE_LABEL"
 fi
 
-export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:latest"
-exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
-exe "docker push $DOCKER_IMAGE_LABEL"
+#export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:latest"
+#exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
+#exe "docker push $DOCKER_IMAGE_LABEL"

@@ -87,7 +87,9 @@ public class EmbededServer
             // Create server
             final Server server = new Server(httpPort);
             ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
-            context.addServlet(createJAXRSServletHolder(EchoService.class, 1), "/*");
+            context.addServlet(createJAXRSServletHolder(CalcService.class, 1), "/calc/*");
+            context.addServlet(createJAXRSServletHolder(LeakService.class, 2), "/leak/*");
+            context.addServlet(createJAXRSServletHolder(EchoService.class, 3), "/*");
 
             // Add both our JAX-RS service and static content to be served by the server
             HandlerList handlers = new HandlerList();

@@ -6,9 +6,30 @@ Toolbox of HTTP services for infra and containers testing:
 * HTTP service causing Java heap leak
 
 # Usage
-Run with
+The application runs either as a fat Jar or as a Docker container.
+
+## Fat Jar
+Get from GIT and build:
 ```
-./gradlew run
+git clone https://github.com/legdba/servicebox.git && cd servicebox && ./gradlew check fatJar
+```
+Then run the app as a fat jar:
+```
+java -jar build/libs/*.jar
+```
+Then connect to http://localhost:8080/ and see the description of the exposed services.
+
+Display help for more details:
+```
+java -jar build/libs/*.jar --help
 ```
 
-Then connect to http://localhost:8080/ and see the exposed services
+## Docker
+Latest version is always available in Quai.io and can be used as a docker application:
+```
+docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox
+```
+Help available the usual way:
+```
+docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox --help
+```

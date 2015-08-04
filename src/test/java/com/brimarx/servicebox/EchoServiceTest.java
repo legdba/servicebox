@@ -15,19 +15,16 @@ public class EchoServiceTest
     {
         Assert.assertEquals(srv.echo("hello"), "hello");
     }
-    /*
+
     @Test
-    public void testDelayedEcho() throws InterruptedException
+    public void testDelayedEcho() throws Exception
     {
-        long t0 = System.currentTimeMillis();
-        Assert.assertEquals(srv.delayedEcho("hello"), "hello");
-        long t1 = System.currentTimeMillis();
-        Assert.assertTrue(t1-t0 > 1900);
+        Assert.assertEquals(srv.delayedEcho("hello", 1), "hello");
     }
 
     @Test
-    public void testExpensiveEcho() throws InterruptedException
+    public void expensiveEcho()
     {
         Assert.assertEquals(srv.expensiveEcho("hello"), "hello");
-    }*/
+    }
 }

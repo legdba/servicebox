@@ -35,7 +35,6 @@ public class CassandraBackend implements Backend {
         for (Row row : results) {
             long v = row.getLong("sum");
             sum += v;
-            logger.info("{} {}", row.getString("id"), v);
         }
         return sum;
     }

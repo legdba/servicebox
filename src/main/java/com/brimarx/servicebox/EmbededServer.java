@@ -4,6 +4,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import org.apache.commons.cli.*;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -22,46 +25,50 @@ public class EmbededServer
 {
     public static void main(String[] args)
     {
-        // Define default config
-        int httpPort = 8080;
-        String appLogLevel  = "info";
-        String rootLogLevel = "warn";
-        String logbackConfig = null;
-        String beEndpoint = "127.0.0.1";
-
-        // Create CLI parsing options
-        Options options = new Options();
-        Option helpOpt           = new Option("h", "help",            false, "display help"); options.addOption(helpOpt);
-        Option httpPortOpt       = new Option("p", "port",            true,  "HTTP server port number; default to " + httpPort); options.addOption(httpPortOpt);
-        Option appLogLevelOpt    = new Option("l", "loglevel",        true,  "application log level: debug, info, warn or error; default to " + appLogLevel); options.addOption(appLogLevelOpt);
-        Option rootLogLevelOpt   = new Option(null,"srvloglevel",     true,  "http server log level: debug, info, warn or error; default to " + appLogLevel); options.addOption(rootLogLevelOpt);
-        Option logbackConfigOpt  = new Option(null,"logconfig",       true,  "logback config file; disables other log options; uses internal preset config and CLI options by default"); options.addOption(logbackConfigOpt);
-        Option beEndpointOpt     = new Option(null,"be-endpoint",     true,  "backend connectivity string; defaults to " + beEndpoint); options.addOption(beEndpointOpt);
-
-        // Parse options
-        CommandLineParser parser = new BasicParser();
-        CommandLine cmd = null;
-        try
-        {
-            cmd = parser.parse(options, args);
-        }
-        catch (ParseException e)
-        {
+        EmbededServer srv = new EmbededServer();
+        try {
+            JCommander jc = new JCommander(srv, args);
+            if (srv.help) {
+                jc.usage();
+                System.exit(0);
+            }
+            srv.run();
+        } catch (ParameterException e) {
             System.err.println(e.getMessage());
-            (new HelpFormatter()).printHelp(EmbededServer.class.getName(), options);
             System.exit(1);
         }
+    }
 
+    private static final int DEFAULT_HTTP_PORT = 8080;
+    private static final String DEFAULT_APP_LOG_LEVEL = "info";
+    private static final String DEFAULT_SRV_LOG_LEVEL = "warn";
+    private static final String DEFAULT_BE_OPTS_CASSANDRA = "127.0.0.1";
+
+    @Parameter(names={"-h", "--help"}, description = "display help")
+    private boolean help = false;
+
+    @Parameter(names={"-p", "--port"}, description = "HTTP server port number; default to " + DEFAULT_HTTP_PORT)
+    private int httpPort = DEFAULT_HTTP_PORT;
+
+    @Parameter(names={"-l", "--log"}, description = "http server log level: debug, info, warn or error; default to  " + DEFAULT_APP_LOG_LEVEL)
+    private String appLogLevel  = DEFAULT_APP_LOG_LEVEL;
+
+    @Parameter(names={      "--logsrv"}, description = "application log level: debug, info, warn or error; default to  " + DEFAULT_SRV_LOG_LEVEL)
+    private String rootLogLevel = DEFAULT_SRV_LOG_LEVEL;
+
+    @Parameter(names={      "--srvloglevel"}, description = "logback config file; disables other log options; uses internal preset config and CLI options by default")
+    private String logbackConfig = null;
+
+    @Parameter(names={      "--be-type"}, description = "backend type; defaults to " + BackendFactory.TYPE_MEMORY + "; cassandra is supported as well and takes a node IP in the --be-endpoint param")
+    private String beType     = BackendFactory.TYPE_MEMORY;
+
+    @Parameter(names={      "--be-opts"}, description = "backend connectivity options; this depends on the --be-type value. 'memory' backend ignores this argument. 'cassandra' backend reads the cluster IP(s) there.")
+    private String beEndpoint = null;
+
+    private void run()
+    {
         try
         {
-            // Set options as per CLI options set
-            if (cmd.hasOption(helpOpt.getLongOpt())) { (new HelpFormatter()).printHelp(EmbededServer.class.getName(), options); System.exit(0); }
-            if (cmd.hasOption(logbackConfigOpt.getLongOpt())) logbackConfig = cmd.getOptionValue(logbackConfigOpt.getLongOpt());
-            httpPort = Integer.parseInt(cmd.getOptionValue(httpPortOpt.getLongOpt(), Integer.toString(httpPort)));
-            appLogLevel = cmd.getOptionValue(appLogLevelOpt.getLongOpt(), appLogLevel);
-            rootLogLevel = cmd.getOptionValue(rootLogLevelOpt.getLongOpt(), rootLogLevel);
-            beEndpoint = cmd.getOptionValue(beEndpointOpt.getValue(), beEndpoint);
-
             // Override logback default config with set options
             if (logbackConfig == null)
             {
@@ -80,7 +87,8 @@ public class EmbededServer
             logger.debug("debug level enabled");
 
             // Set backend connection
-            be = new CassandraBackend(beEndpoint);
+            if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && beEndpoint == null) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
+            be = BackendFactory.build(beType, beEndpoint);
 
             // Expose the resources/webdav directory static content with / as a basedir
             ResourceHandler rh = new ResourceHandler();
@@ -132,8 +140,7 @@ public class EmbededServer
         {
             e.printStackTrace(System.err);
             System.exit(2);
-        }
-    }
+        }    }
 
     private static void initLogsFrom(String file) throws JoranException
     {

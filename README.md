@@ -27,9 +27,9 @@ java -jar build/libs/*.jar --help
 ## Docker
 Latest version is always available in Quai.io and can be used as a docker application:
 ```
-docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox
+docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox:latest
 ```
 Help available the usual way:
 ```
-docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox --help
+docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox:latest --help
 ```

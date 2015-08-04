@@ -192,18 +192,22 @@ if [ $LOCAL == NO ]
 then
 
     echo "=== pushing Docker Image(s) ==="
+    
+    # Push an image with a label set to the binary version
     export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$VERSION"
-    exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
+    exe "docker tag -f $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
     exe "docker push $DOCKER_IMAGE_LABEL"
-
-    if [ "$BRANCH" != "master" ]
+    
+    if [ "$BRANCH" == "master" ]
     then
-        export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$BRANCH"
-        exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
+        # If we are on master push and image with label 'latest'
+        export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:latest"
+        exe "docker tag -f $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
         exe "docker push $DOCKER_IMAGE_LABEL"
-
-        #export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:latest"
-        #exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
-        #exe "docker push $DOCKER_IMAGE_LABEL"
+    else
+        # If we are NOT master push and image with label set to the branch name
+        export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$BRANCH"
+        exe "docker tag -f $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
+        exe "docker push $DOCKER_IMAGE_LABEL"
     fi
 fi

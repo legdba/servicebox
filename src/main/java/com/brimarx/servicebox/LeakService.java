@@ -26,6 +26,17 @@ public class LeakService {
         return String.format("leaked %d bytes", size);
     }
 
+    @GET
+    @Path("/free")
+    @Produces("text/plain")
+    public String free()
+    {
+        leaks.clear();
+        total.set(0);
+        logger.info("released retained references");
+        return "flushed leaked references";
+    }
+
     private static final AtomicLong total = new AtomicLong();
     private static final List<ByteBuffer> leaks = new LinkedList<>();
     private static final Logger logger = LoggerFactory.getLogger(LeakService.class);

@@ -7,7 +7,6 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import com.brimarx.servicebox.backend.Backend;
 import com.brimarx.servicebox.backend.BackendFactory;
 import com.brimarx.servicebox.services.CalcService;
 import com.brimarx.servicebox.services.EchoService;

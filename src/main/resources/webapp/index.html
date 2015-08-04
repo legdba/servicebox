@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hello</title>
+    <title>Service BOX</title>
   </head>
-  <body>
-    <p>Hello</p>
+  <p>
+    <p>HTTP services for testing of infra and containers.</p>
+    <h1>GET /echo/{something}</h1>
+    <p/>Returns {something}.</p>
+    <h1>GET /echooo/{something}/{delayms}</h1>
+    <p/>Returns {something} after a {delayms} wait time.</p>
+    <h1>GET /ECHO/{something}</h1>
+    <p/>Returns {something} after CPU intensive math operations; good to cause CPU load.</p>
+    <h1>GET /add/{a}/{b}</h1>
+    <p/>Returns the integer result of {a}+{b}; Both {a} and {b} must be integers.</p>
+    <h1>GET /leak/{size}</h1>
+    <p/>Leaks {size} bytes of data on Java heap and returns with a status of leaked and total leaked heap.</p>
   </body>
 </html>

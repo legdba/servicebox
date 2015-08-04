@@ -3,10 +3,7 @@ package com.brimarx.servicebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.GET;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 
 /**
  * Echo REST service
@@ -14,6 +11,11 @@ import javax.ws.rs.Produces;
 @Path("/")
 public class EchoService
 {
+    @OPTIONS
+    public String healthcheck() {
+        return "up";
+    }
+
     @GET
     @Path("echo/{something}")
     @Produces("text/plain")

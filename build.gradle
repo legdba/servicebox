@@ -30,7 +30,8 @@ dependencies {
                 'org.glassfish.jersey.containers:jersey-container-servlet:2.+',
                 'org.eclipse.jetty:jetty-server:9.2.3.v20140905',
                 'org.eclipse.jetty:jetty-servlet:9.2.3.v20140905',
-                'commons-cli:commons-cli:1.2'
+                'commons-cli:commons-cli:1.2',
+                'com.datastax.cassandra:cassandra-driver-core:2.2.0-rc2'
                 
     testCompile 'org.testng:testng:6.+',
                 'org.uncommons:reportng:1.1.4',

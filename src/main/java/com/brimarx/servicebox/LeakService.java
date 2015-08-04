@@ -4,10 +4,7 @@ package com.brimarx.servicebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.GET;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +12,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/")
 public class LeakService {
+    @OPTIONS
+    public String healthcheck() {
+        return "up";
+    }
+
     @GET
     @Path("/{size}")
     @Produces("text/plain")

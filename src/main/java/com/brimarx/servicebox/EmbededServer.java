@@ -27,6 +27,7 @@ public class EmbededServer
         String appLogLevel  = "info";
         String rootLogLevel = "warn";
         String logbackConfig = null;
+        String beEndpoint = "127.0.0.1";
 
         // Create CLI parsing options
         Options options = new Options();
@@ -35,6 +36,7 @@ public class EmbededServer
         Option appLogLevelOpt    = new Option("l", "loglevel",        true,  "application log level: debug, info, warn or error; default to " + appLogLevel); options.addOption(appLogLevelOpt);
         Option rootLogLevelOpt   = new Option(null,"srvloglevel",     true,  "http server log level: debug, info, warn or error; default to " + appLogLevel); options.addOption(rootLogLevelOpt);
         Option logbackConfigOpt  = new Option(null,"logconfig",       true,  "logback config file; disables other log options; uses internal preset config and CLI options by default"); options.addOption(logbackConfigOpt);
+        Option beEndpointOpt     = new Option(null,"be-endpoint",     true,  "backend connectivity string; defaults to " + beEndpoint); options.addOption(beEndpointOpt);
 
         // Parse options
         CommandLineParser parser = new BasicParser();
@@ -58,6 +60,7 @@ public class EmbededServer
             httpPort = Integer.parseInt(cmd.getOptionValue(httpPortOpt.getLongOpt(), Integer.toString(httpPort)));
             appLogLevel = cmd.getOptionValue(appLogLevelOpt.getLongOpt(), appLogLevel);
             rootLogLevel = cmd.getOptionValue(rootLogLevelOpt.getLongOpt(), rootLogLevel);
+            beEndpoint = cmd.getOptionValue(beEndpointOpt.getValue(), beEndpoint);
 
             // Override logback default config with set options
             if (logbackConfig == null)
@@ -76,6 +79,9 @@ public class EmbededServer
             logger.info("info level enabled");
             logger.debug("debug level enabled");
 
+            // Set backend connection
+            be = new CassandraBackend(beEndpoint);
+
             // Expose the resources/webdav directory static content with / as a basedir
             ResourceHandler rh = new ResourceHandler();
             rh.setDirectoriesListed(true);rh.setWelcomeFiles(new String[]{"index.html"});
@@ -89,7 +95,7 @@ public class EmbededServer
             ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
             context.addServlet(createJAXRSServletHolder(CalcService.class, 1), "/calc/*");
             context.addServlet(createJAXRSServletHolder(LeakService.class, 2), "/leak/*");
-            context.addServlet(createJAXRSServletHolder(EchoService.class, 3), "/*");
+            context.addServlet(createJAXRSServletHolder(EchoService.class, 3), "/echo/*");
 
             // Add both our JAX-RS service and static content to be served by the server
             HandlerList handlers = new HandlerList();
@@ -114,7 +120,7 @@ public class EmbededServer
                     }
                     catch (Exception e)
                     {
-                        logger.error("server failed", e);
+                        logger.error("server stop failed", e);
                     }
                 }
             });
@@ -143,11 +149,12 @@ public class EmbededServer
     private static ServletHolder createJAXRSServletHolder(Class clazz, int order) {
         ServletHolder sh = new ServletHolder(ServletContainer.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
-        sh.setInitParameter("jersey.config.server.provider.packages", clazz.getPackage().getName());
+        sh.setInitParameter("jersey.config.server.provider.classnames", clazz.getCanonicalName());
         sh.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
         sh.setInitOrder(order);
         return sh;
     }
 
+    public static Backend be;
     private static Logger logger = null; // don't init statically to avoid slf4j init to occur before command line is read an log options set
 }

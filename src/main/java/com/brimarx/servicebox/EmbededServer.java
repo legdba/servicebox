@@ -44,10 +44,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class EmbededServer
-{
-    public static void main(String[] args)
-    {
+public class EmbededServer {
+    public static void main(String[] args) {
         EmbededServer srv = new EmbededServer();
         try {
             JCommander jc = new JCommander(srv, args);
@@ -92,87 +90,39 @@ public class EmbededServer
     @Parameter(names={      "--log-tspattern"}, description = "logs timestamp pattern; defaults to " + DEFAULT_TSPATTERN)
     private String tsppatern = DEFAULT_TSPATTERN;
 
-    private void run()
-    {
-        try
-        {
-            // Override logback default config with set options
-            System.setProperty("TSPATTERN", tsppatern);
-            if (logbackConfig == null)
-            {
-                System.setProperty("LOGLEVEL_APP", appLogLevel);
-                System.setProperty("LOGLEVEL_SRV", rootLogLevel);
-            }
-            else
-            {
-                initLogsFrom(logbackConfig);
-            }
-            logger = LoggerFactory.getLogger(EmbededServer.class);
-
-            // We are done with init, now we can setup and start the server itself
-            logger.info("server starting...");
-            logger.info("info level enabled");
-            logger.debug("debug level enabled");
-
-            // Set backend connection
-            if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && beEndpoint == null) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
-            CalcService.setBackend(BackendFactory.build(beType, beEndpoint));
-
-
-            // Expose the resources/webdav directory static content with / as a basedir
-            ResourceHandler rh = new ResourceHandler();
-            rh.setDirectoriesListed(true);rh.setWelcomeFiles(new String[]{"index.html"});
-            java.net.URL webappResource = EmbededServer.class.getClassLoader().getResource("webapp");
-            if (webappResource == null) throw new IllegalStateException("webapp resource not found");
-            String webDir = webappResource.toExternalForm();
-            rh.setResourceBase(webDir);
-
-            // Create server
-            final Server server = new Server(httpPort);
-            ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
-            context.addServlet(createJAXRSServletHolder(CalcService.class, 1), "/calc/*");
-            context.addServlet(createJAXRSServletHolder(LeakService.class, 2), "/leak/*");
-            context.addServlet(createJAXRSServletHolder(EchoService.class, 3), "/echo/*");
-
-            // Add both our JAX-RS service and static content to be served by the server
-            HandlerList handlers = new HandlerList();
-            handlers.setHandlers(new Handler[] { rh, context, new DefaultHandler() });
-            server.setHandler(handlers);
-
-            // Set graceful shutdown limited to 1sec
-            server.setStopAtShutdown(true);
-            server.setStopTimeout(1000);
-
-            // Run the server
-            server.start();
-            logger.warn("server started; serving requests on port {} ...", httpPort);
-            Runtime.getRuntime().addShutdownHook(new Thread()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        logger.warn("SIGTERM, stopping server");
-                        server.stop();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("server stop failed", e);
-                    }
-                }
-            });
-            server.join();
-            logger.warn("server stopped");
-            System.exit(0);
-        }
-        catch (Exception e)
-        {
+    private void run() {
+        try {
+            initLogs();
+            logger.info("logs initialized");
+            logger.debug("debug enabled");
+        } catch (Exception e) {
             e.printStackTrace(System.err);
             System.exit(2);
-        }    }
+        }
 
-    private static void initLogsFrom(String file) throws JoranException
-    {
+        try {
+            initBackend();
+            initJetty();
+            runJettyAndWait();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            System.exit(2);
+        }
+    }
+
+    private void initLogs() throws JoranException {
+        // Override logback default config with set options
+        System.setProperty("TSPATTERN", tsppatern);
+        if (logbackConfig == null) {
+            System.setProperty("LOGLEVEL_APP", appLogLevel);
+            System.setProperty("LOGLEVEL_SRV", rootLogLevel);
+        } else {
+            initLogsFrom(logbackConfig);
+        }
+        logger = LoggerFactory.getLogger(EmbededServer.class);
+    }
+
+    private void initLogsFrom(String file) throws JoranException {
         File fn = new File(file);
         LoggerContext context  = (LoggerContext)LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
@@ -181,8 +131,57 @@ public class EmbededServer
         configurator.doConfigure(fn);
     }
 
+    private void initBackend() {
+        if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && beEndpoint == null) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
+        CalcService.setBackend(BackendFactory.build(beType, beEndpoint));
+    }
+
+    private void initJetty() {
+        // Expose the resources/webdav directory static content with / as a basedir
+        ResourceHandler rh = new ResourceHandler();
+        rh.setDirectoriesListed(true);rh.setWelcomeFiles(new String[]{"index.html"});
+        java.net.URL webappResource = EmbededServer.class.getClassLoader().getResource("webapp");
+        if (webappResource == null) throw new IllegalStateException("webapp resource not found");
+        String webDir = webappResource.toExternalForm();
+        rh.setResourceBase(webDir);
+
+        // Create server
+        server = new Server(httpPort);
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
+        context.addServlet(createJAXRSServletHolder(CalcService.class, 1), "/calc/*");
+        context.addServlet(createJAXRSServletHolder(LeakService.class, 2), "/leak/*");
+        context.addServlet(createJAXRSServletHolder(EchoService.class, 3), "/echo/*");
+
+        // Add both our JAX-RS service and static content to be served by the server
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] { rh, context, new DefaultHandler() });
+        server.setHandler(handlers);
+
+        // Set graceful shutdown limited to 1sec
+        server.setStopAtShutdown(true);
+        server.setStopTimeout(1000);
+    }
+
+    private void runJettyAndWait() throws Exception {
+        logger.info("server starting...");
+        server.start();
+        logger.warn("server started; serving requests on port {} ...", httpPort);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    logger.warn("SIGTERM, stopping server");
+                    server.stop();
+                } catch (Exception e) {
+                    logger.error("server stop failed", e);
+                }
+            }
+        });
+        server.join();
+        logger.warn("server stopped");
+    }
+
     // Create the embeded service with JAX-RS interface enabled
-    private static ServletHolder createJAXRSServletHolder(Class clazz, int order) {
+    private ServletHolder createJAXRSServletHolder(Class clazz, int order) {
         ServletHolder sh = new ServletHolder(ServletContainer.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         sh.setInitParameter("jersey.config.server.provider.classnames", clazz.getCanonicalName());
@@ -191,5 +190,6 @@ public class EmbededServer
         return sh;
     }
 
+    private Server server;
     private static Logger logger = null; // don't init statically to avoid slf4j init to occur before command line is read an log options set
 }

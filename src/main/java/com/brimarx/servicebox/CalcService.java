@@ -14,7 +14,7 @@ public class CalcService {
     @GET
     @Path("add/{a}/{b}")
     @Produces("text/plain")
-    public int echo(@PathParam("a") int a, @PathParam("b") int b)
+    public int add(@PathParam("a") int a, @PathParam("b") int b)
     {
         int c = a+b;
         logger.info("{}+{}={}", a, b, c);

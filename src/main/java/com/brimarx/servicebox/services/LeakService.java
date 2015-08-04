@@ -1,4 +1,4 @@
-package com.brimarx.servicebox;
+package com.brimarx.servicebox.services;
 
 
 import org.slf4j.Logger;

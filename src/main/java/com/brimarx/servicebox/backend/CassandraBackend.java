@@ -1,4 +1,4 @@
-package com.brimarx.servicebox;
+package com.brimarx.servicebox.backend;
 
 import com.datastax.driver.core.*;
 import org.slf4j.Logger;

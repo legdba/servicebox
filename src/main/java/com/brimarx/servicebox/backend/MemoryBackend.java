@@ -1,4 +1,4 @@
-package com.brimarx.servicebox;
+package com.brimarx.servicebox.backend;
 
 import java.util.HashMap;
 import java.util.Map;

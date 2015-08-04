@@ -1,5 +1,6 @@
-package com.brimarx.servicebox;
+package com.brimarx.servicebox.services;
 
+import com.brimarx.servicebox.services.EchoService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

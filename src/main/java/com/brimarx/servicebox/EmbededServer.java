@@ -7,7 +7,11 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import org.apache.commons.cli.*;
+import com.brimarx.servicebox.backend.Backend;
+import com.brimarx.servicebox.backend.BackendFactory;
+import com.brimarx.servicebox.services.CalcService;
+import com.brimarx.servicebox.services.EchoService;
+import com.brimarx.servicebox.services.LeakService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -88,7 +92,8 @@ public class EmbededServer
 
             // Set backend connection
             if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && beEndpoint == null) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
-            be = BackendFactory.build(beType, beEndpoint);
+            CalcService.setBackend(BackendFactory.build(beType, beEndpoint));
+
 
             // Expose the resources/webdav directory static content with / as a basedir
             ResourceHandler rh = new ResourceHandler();
@@ -162,6 +167,5 @@ public class EmbededServer
         return sh;
     }
 
-    public static Backend be;
     private static Logger logger = null; // don't init statically to avoid slf4j init to occur before command line is read an log options set
 }

@@ -1,4 +1,4 @@
-package com.brimarx.servicebox;
+package com.brimarx.servicebox.backend;
 
 /**
  * Created by vincent on 04/08/15.

@@ -46,6 +46,7 @@ public class EmbededServer
     private static final String DEFAULT_APP_LOG_LEVEL = "info";
     private static final String DEFAULT_SRV_LOG_LEVEL = "warn";
     private static final String DEFAULT_BE_OPTS_CASSANDRA = "127.0.0.1";
+    private static final String DEFAULT_TSPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
 
     @Parameter(names={"-h", "--help"}, description = "display help")
     private boolean help = false;
@@ -68,11 +69,15 @@ public class EmbededServer
     @Parameter(names={      "--be-opts"}, description = "backend connectivity options; this depends on the --be-type value. 'memory' backend ignores this argument. 'cassandra' backend reads the cluster IP(s) there.")
     private String beEndpoint = null;
 
+    @Parameter(names={      "--log-tspattern"}, description = "logs timestamp pattern; defaults to " + DEFAULT_TSPATTERN)
+    private String tsppatern = DEFAULT_TSPATTERN;
+
     private void run()
     {
         try
         {
             // Override logback default config with set options
+            System.setProperty("TSPATTERN", tsppatern);
             if (logbackConfig == null)
             {
                 System.setProperty("LOGLEVEL_APP", appLogLevel);

@@ -14,7 +14,7 @@
             d. timestamp includes milliseconds for better accuracy; the .SSS millis fraction after seconds is ISO8601 standard
             e. single-line (except for stack-traces)
             -->
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXX} %-5level %c{20} %-15thread - %msg%n</pattern>
+            <pattern>%d{${TSPATTERN}} %-5level %c{20} %-15thread - %msg%n</pattern>
         </encoder>
     </appender>
 

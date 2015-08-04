@@ -4,8 +4,17 @@
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <!--pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern-->
-            <pattern>%d{HH:mm:ss.SSS} %-5level [%X] - %msg%n</pattern>
+            <!--
+            Log format design to be easy to read, easy to parse with shell tool (grep, awk, ...) and easy to
+            parse with third-party logs processing tools. As such:
+            a. message is the last field
+            b. except for the message all fields have no withespaces and fixed size
+            c. timestamp is ISO8601 which is widely supported and used all over W3C and IETF standards because it
+               solves most timestamp ambiguities and problems (and there are a LOT or them)
+            d. timestamp includes milliseconds for better accuracy; the .SSS millis fraction after seconds is ISO8601 standard
+            e. single-line (except for stack-traces)
+            -->
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXX} %-5level %c{20} %-15thread - %msg%n</pattern>
         </encoder>
     </appender>
 

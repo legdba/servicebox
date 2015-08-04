@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/legdba/servicebox.svg?style=svg)](https://circleci.com/gh/legdba/servicebox)
+[![Circle CI](https://circleci.com/gh/legdba/servicebox.svg?style=shield)](https://circleci.com/gh/legdba/servicebox)
 [![Docker Repository on Quay.io](https://quay.io/repository/legdba/servicebox/status "Docker Repository on Quay.io")](https://quay.io/repository/legdba/servicebox)
 # Overview
 Toolbox of HTTP services for infra and containers testing:

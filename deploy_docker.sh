@@ -8,11 +8,40 @@
 # in order to allow || exit 1 to catch it and exit.
 set -o pipefail
 
+LOCAL=NO
+DRYRUN=NO
+# Parse arguments
+for i in "$@"
+do
+case $i in
+    --local)
+    LOCAL=YES
+    shift # past argument with no value
+    ;;
+    --dryrun)
+    DRYRUN=YES
+    shift # past argument with no value
+    ;;
+    *)
+            echo "invalid argument"
+            echo "usage: [--dryrun] [--local]"
+            exit 1
+    ;;
+esac
+done
+echo
+echo "=== read arguments ==="
+echo "LOCAL           = ${LOCAL}"
+echo "DRYRUN          = ${DRYRUN}"
+if [[ -n $1 ]]; then
+    echo "Last line of file specified as non-opt/last argument:"
+    tail -1 $1
+fi
+
 ###############################################################################
 # Handle dry-run mode
 ###############################################################################
-export DRYRUN=$1
-if [ "$DRYRUN" != "" ]
+if [ $DRYRUN == YES ]
 then
     echo
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -28,14 +57,14 @@ fi
 # Print and run
 exe() {
     echo "\$ $@"
-    if [ "$DRYRUN" == "" ]
+    if [ $DRYRUN == NO ]
     then
         eval "$@" || exit 1
     fi
 }
 # run without printing (convenient for commands with secrets)
 run() {
-    if [ "$DRYRUN" == "" ]
+    if [ $DRYRUN == NO ]
     then
         eval "$@" || exit 1
     fi
@@ -134,8 +163,9 @@ exe "cd -"
 # Generate Dockerfile
 ###############################################################################
 echo
-echo "=== Generating Dockerfile ==="
-exe "cat Dockerfile.in | sed \"s/__APP__/$(echo $APP | sed -e 's/[\/&]/\\&/g')/g\" | sed \"s/__FATJAR__/$(echo $ARTIFACT | sed -e 's/[\/&]/\\&/g')/g\" > $ARTIFACTS_PATH/Dockerfile"
+echo "=== Generating Dockerfile and docker resources archive ==="
+exe "cat docker/Dockerfile.in | sed \"s/__APP__/$(echo $APP | sed -e 's/[\/&]/\\&/g')/g\" | sed \"s/__FATJAR__/$(echo $ARTIFACT | sed -e 's/[\/&]/\\&/g')/g\" > $ARTIFACTS_PATH/Dockerfile"
+exe "cp docker/* $ARTIFACTS_PATH/"
 
 ###############################################################################
 # Generate Docker Image
@@ -144,10 +174,13 @@ echo
 echo "=== generating Docker Image(s) ==="
 exe "cd $ARTIFACTS_PATH"
 exe "tar cvzf $ARTIFACT.tgz $ARTIFACT $ARTIFACT.sha1 Dockerfile"
-echo "\$ docker login --username=$DOCKER_REPO_USER --password=\$DOCKER_REPO_TOKEN --email=$DOCKER_REPO_EMAIL $DOCKER_REPO"
-run "docker login --username=$DOCKER_REPO_USER --password=$DOCKER_REPO_TOKEN --email=$DOCKER_REPO_EMAIL $DOCKER_REPO"
+if [ $LOCAL == NO ]
+then
+    echo "\$ docker login --username=$DOCKER_REPO_USER --password=\$DOCKER_REPO_TOKEN --email=$DOCKER_REPO_EMAIL $DOCKER_REPO"
+    run "docker login --username=$DOCKER_REPO_USER --password=$DOCKER_REPO_TOKEN --email=$DOCKER_REPO_EMAIL $DOCKER_REPO"
+fi
 export DOCKER_IMAGE_NAME="$DOCKER_REPO/legdba/$APP"
-exe "docker build --tag=\"$DOCKER_IMAGE_NAME\" ."
+exe "docker build --pull=true --tag=\"$DOCKER_IMAGE_NAME\" ."
 exe "docker run -ti -P $DOCKER_IMAGE_NAME --help"
 exe "cd -"
 
@@ -155,18 +188,22 @@ exe "cd -"
 # Push Docker images
 ###############################################################################
 echo
-echo "=== pushing Docker Image(s) ==="
-export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$VERSION"
-exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
-exe "docker push $DOCKER_IMAGE_LABEL"
-
-if [ "$BRANCH" != "master" ]
+if [ $LOCAL == NO ]
 then
-    export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$BRANCH"
+
+    echo "=== pushing Docker Image(s) ==="
+    export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$VERSION"
     exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
     exe "docker push $DOCKER_IMAGE_LABEL"
-fi
 
-#export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:latest"
-#exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
-#exe "docker push $DOCKER_IMAGE_LABEL"
+    if [ "$BRANCH" != "master" ]
+    then
+        export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:$BRANCH"
+        exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
+        exe "docker push $DOCKER_IMAGE_LABEL"
+
+        #export DOCKER_IMAGE_LABEL="$DOCKER_IMAGE_NAME:latest"
+        #exe "docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_LABEL"
+        #exe "docker push $DOCKER_IMAGE_LABEL"
+    fi
+fi

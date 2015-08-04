@@ -1,25 +1,30 @@
 ###############################################################################
 # Java __APP__ service for testing purpose.
 #
-# Run as a daemon with:
+# Run server with:
 # docker run -d -p 80:8080 quay.io/legdba/httpecho:[tag]
 #
 # To get the list of supported arguments run
 # docker run -ti --rm -p 80:8080 quay.io/legdba/httpecho:[tag] --help
 #
-# TODO: force JVM kill upon OOM
-#
 ###############################################################################
-FROM azul/zulu-openjdk-debian:8
+FROM legdba/javaw:jdk-8u51
 MAINTAINER Vincent Bourdaraud <vincent@bourdaraud.com>
 
-# Prepare for service (dirs, user, port, command)
-RUN mkdir /opt/__APP__ && \
-    groupadd -r __APP__ && \
-    useradd -r -g __APP__ __APP__
+# Prepare for dir
+RUN mkdir /opt/__APP__
+
+# Prepare for service
 WORKDIR /opt/__APP__
 CMD ["-p", "8080"]
-ENTRYPOINT ["java", "-jar", "/opt/__APP__/__APP__-all.jar"]
+ENTRYPOINT [\
+    "javaw",\
+    "-XX:OnOutOfMemoryError=kill -9 %p",\
+    "-Xms50m",\
+    "-Xmx50m",\
+    "-jar",\
+    "/opt/__APP__/__APP__-all.jar"\
+    ]
 EXPOSE 8080
 
 # Add Java App (copy one by one because of a bug on Docker 1.2-circleci on
@@ -29,5 +34,4 @@ COPY __FATJAR__.sha1 /opt/__APP__/
 COPY Dockerfile /opt/__APP__/
 RUN sha1sum -c __FATJAR__.sha1 && \
     ln -s __FATJAR__ __APP__-all.jar && \
-    java -jar __APP__-all.jar --help
-USER __APP__
+    javaw -jar __APP__-all.jar --help

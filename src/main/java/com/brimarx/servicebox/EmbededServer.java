@@ -60,22 +60,22 @@ public class EmbededServer {
         }
     }
 
-    private static final int DEFAULT_HTTP_PORT = 8080;
-    private static final String DEFAULT_APP_LOG_LEVEL = "info";
-    private static final String DEFAULT_SRV_LOG_LEVEL = "warn";
+    private static final int    DEFAULT_HTTP_PORT         = 8080;
+    private static final String DEFAULT_APP_LOG_LEVEL     = "info";
+    private static final String DEFAULT_SRV_LOG_LEVEL     = "warn";
     private static final String DEFAULT_BE_OPTS_CASSANDRA = "127.0.0.1";
-    private static final String DEFAULT_TSPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
+    private static final String DEFAULT_TSPATTERN         = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
 
     @Parameter(names={"-h", "--help"}, description = "display help")
     private boolean help = false;
 
-    @Parameter(names={"-p", "--port"}, description = "HTTP server port number; default to " + DEFAULT_HTTP_PORT)
+    @Parameter(names={"-p", "--port"}, description = "HTTP server port number; defaults to " + DEFAULT_HTTP_PORT)
     private int httpPort = DEFAULT_HTTP_PORT;
 
-    @Parameter(names={"-l", "--log"}, description = "http server log level: debug, info, warn or error; default to  " + DEFAULT_APP_LOG_LEVEL)
+    @Parameter(names={"-l", "--log"}, description = "http server log level: debug, info, warn or error; defaults to  " + DEFAULT_APP_LOG_LEVEL)
     private String appLogLevel  = DEFAULT_APP_LOG_LEVEL;
 
-    @Parameter(names={      "--logsrv"}, description = "application log level: debug, info, warn or error; default to  " + DEFAULT_SRV_LOG_LEVEL)
+    @Parameter(names={      "--logsrv"}, description = "application log level: debug, info, warn or error; defaults to  " + DEFAULT_SRV_LOG_LEVEL)
     private String rootLogLevel = DEFAULT_SRV_LOG_LEVEL;
 
     @Parameter(names={      "--srvloglevel"}, description = "logback config file; disables other log options; uses internal preset config and CLI options by default")

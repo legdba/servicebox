@@ -90,6 +90,9 @@ public class EmbededServer {
     @Parameter(names={      "--log-tspattern"}, description = "logs timestamp pattern; defaults to " + DEFAULT_TSPATTERN)
     private String tsppatern = DEFAULT_TSPATTERN;
 
+    @Parameter(names={      "--slowstart"}, description = "delay (in ms) before the server actually accept any connection, usefull to test that load-balancers are not including the service in pool before it is actually available; disabled by default")
+    private int slowstart = 0;
+
     private void run() {
         try {
             initLogs();
@@ -103,6 +106,7 @@ public class EmbededServer {
         try {
             initBackend();
             initJetty();
+            slowstart();
             runJettyAndWait();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -178,6 +182,15 @@ public class EmbededServer {
         });
         server.join();
         logger.warn("server stopped");
+    }
+
+    private void slowstart() throws InterruptedException {
+        if (slowstart > 0) {
+            logger.info("server start defered by {}ms (--slowstart option used)", slowstart);
+            synchronized(this) {
+                wait(slowstart);
+            }
+        }
     }
 
     // Create the embeded service with JAX-RS interface enabled

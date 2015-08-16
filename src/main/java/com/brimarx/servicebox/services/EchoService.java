@@ -31,11 +31,6 @@ import javax.ws.rs.*;
 @Path("/")
 public class EchoService
 {
-    @OPTIONS
-    public String healthcheck() {
-        return "up";
-    }
-
     @GET
     @Path("echo/{something}")
     @Produces("text/plain")

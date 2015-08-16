@@ -30,6 +30,7 @@ import com.beust.jcommander.ParameterException;
 import com.brimarx.servicebox.backend.BackendFactory;
 import com.brimarx.servicebox.services.CalcService;
 import com.brimarx.servicebox.services.EchoService;
+import com.brimarx.servicebox.services.HealthService;
 import com.brimarx.servicebox.services.LeakService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -155,6 +156,7 @@ public class EmbededServer {
         context.addServlet(createJAXRSServletHolder(CalcService.class, 1), "/calc/*");
         context.addServlet(createJAXRSServletHolder(LeakService.class, 2), "/leak/*");
         context.addServlet(createJAXRSServletHolder(EchoService.class, 3), "/echo/*");
+        context.addServlet(createJAXRSServletHolder(HealthService.class, 4), "/health/*");
 
         // Add both our JAX-RS service and static content to be served by the server
         HandlerList handlers = new HandlerList();

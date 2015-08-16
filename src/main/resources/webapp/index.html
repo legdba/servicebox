@@ -26,5 +26,11 @@
     <p/>Leaks {size} bytes of data on Java heap and returns with a status of leaked and total leaked heap.</p>
     <h1>GET /leak/free</h1>
     <p/>Frees all retained references causing the leak. Nex GC or Full-GC can reclaim associated heap.</p>
+    <h1>GET /env/vars</h1>
+    <p/>Returns all system environmement variables.</p>
+    <h1>GET /env/vars/{name}</h1>
+    <p/>Return the value of the system environmement variable {name}.</p>
+    <h1>GET /env/hostname</h1>
+    <p/>Return the value InetAddress.getLocalHost().getHostName() which is usually good enough to get the hostname.</p>
   </body>
 </html>

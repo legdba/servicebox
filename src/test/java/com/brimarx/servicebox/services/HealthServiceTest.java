@@ -20,7 +20,7 @@ public class HealthServiceTest {
     {
         double ratio=0.5;
         double sum=0;
-        int iter=1000;
+        int iter=10000;
         for (int i = iter; i > 0; i--) {
             try {
                 srv.checkOrFail(ratio); // 50% chance of success

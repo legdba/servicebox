@@ -23,35 +23,26 @@ package com.brimarx.servicebox.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import java.util.Random;
+import javax.ws.rs.*;
 
 /**
- * Created by vincent on 16/08/15.
+ * Echo REST service
  */
-@Path("/health")
-public class HealthService {
+@Path("/ECHO")
+public class EchoIntensiveService
+{
     @GET
+    @Path("/{something}")
     @Produces("text/plain")
-    public String check()
+    public String expensiveEcho(@PathParam("something") String something)
     {
-        return "up";
+        logger.debug("about to expensiveEcho '{}'", something);
+        for (double val = 100000000; val > 0; val--) {
+            Math.atan(Math.sqrt(Math.pow(val, 10)));
+        }
+        logger.info("expensiveEcho '{}'", something);
+        return something;
     }
 
-    @GET
-    @Path("/{percentage}")
-    @Produces("text/plain")
-    public String checkOrFail(@PathParam("percentage") double percentage)
-    {
-        double f = rand.nextDouble();
-        logger.info("check with percentage={} and random={}", percentage, f);
-        if (f > percentage) throw new javax.ws.rs.ServiceUnavailableException("health-check failed on purpose for testing");
-        else return "up";
-    }
-
-    private static final Random rand = new Random(System.currentTimeMillis() * Runtime.getRuntime().freeMemory());
-    private static final Logger logger = LoggerFactory.getLogger(HealthService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EchoIntensiveService.class);
 }

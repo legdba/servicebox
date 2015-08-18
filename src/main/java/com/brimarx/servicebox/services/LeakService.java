@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Path("/")
+@Path("/leak")
 public class LeakService {
     @OPTIONS
     public String healthcheck() {

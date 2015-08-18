@@ -5,18 +5,18 @@
   </head>
   <p>
     <p>HTTP services for testing of infra and containers.</p>
-    <h1>GET /health/check</h1>
+    <h1>GET /health</h1>
     <p/>Returns "up".</p>
     <h1>GET /health/check/{percentage}</h1>
     <p/>
       Returns "up" with {percentage} chance, or fail with an exception. {percentage} is a float number between 0 and 1.
       Usefull for health-checking scripts testing.
     </p>
-    <h1>GET /echo/echo/{something}</h1>
+    <h1>GET /echo/{something}</h1>
     <p/>Returns {something}.</p>
-    <h1>GET /echo/echooo/{something}/{delayms}</h1>
+    <h1>GET /echooo/{something}/{delayms}</h1>
     <p/>Returns {something} after a {delayms} wait time.</p>
-    <h1>GET /echo/ECHO/{something}</h1>
+    <h1>GET /ECHO/{something}</h1>
     <p/>Returns {something} after CPU intensive math operations; good to cause CPU load.</p>
     <h1>GET /calc/add/{a}/{b}</h1>
     <p/>Returns the integer result of {a}+{b}; Both {a} and {b} must be integers.</p>

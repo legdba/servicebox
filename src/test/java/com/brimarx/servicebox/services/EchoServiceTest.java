@@ -36,16 +36,4 @@ public class EchoServiceTest
     {
         Assert.assertEquals(srv.echo("hello"), "hello");
     }
-
-    @Test
-    public void testDelayedEcho() throws Exception
-    {
-        Assert.assertEquals(srv.delayedEcho("hello", 1), "hello");
-    }
-
-    @Test
-    public void expensiveEcho()
-    {
-        Assert.assertEquals(srv.expensiveEcho("hello"), "hello");
-    }
 }

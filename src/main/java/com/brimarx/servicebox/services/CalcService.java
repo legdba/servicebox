@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 
-@Path("/")
+@Path("/calc")
 public class CalcService {
     public static void setBackend(Backend be) { backend = be; } // TODO: fix this ugly hack and have proper injection setup
 

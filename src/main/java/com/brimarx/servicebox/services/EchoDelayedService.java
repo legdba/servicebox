@@ -23,35 +23,28 @@ package com.brimarx.servicebox.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import java.util.Random;
+import javax.ws.rs.*;
 
 /**
- * Created by vincent on 16/08/15.
+ * Delayed echo REST service
  */
-@Path("/health")
-public class HealthService {
+@Path("/echooo")
+public class EchoDelayedService
+{
     @GET
+    @Path("/{something}/{delayms}")
     @Produces("text/plain")
-    public String check()
+    public String delayedEcho(@PathParam("something") String something, @PathParam("delayms") int delayms) throws InterruptedException
     {
-        return "up";
+        logger.debug("delayedEcho sleeping '{}'ms", delayms);
+        if (delayms > 0) {
+            synchronized(Thread.currentThread()) {
+                Thread.currentThread().wait(delayms);
+            }
+        }
+        logger.info("delayedEcho '{}' after {}ms", something, delayms);
+        return something;
     }
 
-    @GET
-    @Path("/{percentage}")
-    @Produces("text/plain")
-    public String checkOrFail(@PathParam("percentage") double percentage)
-    {
-        double f = rand.nextDouble();
-        logger.info("check with percentage={} and random={}", percentage, f);
-        if (f > percentage) throw new javax.ws.rs.ServiceUnavailableException("health-check failed on purpose for testing");
-        else return "up";
-    }
-
-    private static final Random rand = new Random(System.currentTimeMillis() * Runtime.getRuntime().freeMemory());
-    private static final Logger logger = LoggerFactory.getLogger(HealthService.class);
+    private static final Logger logger = LoggerFactory.getLogger(EchoDelayedService.class);
 }

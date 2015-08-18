@@ -149,12 +149,13 @@ public class EmbededServer {
 
         // Create server
         server = new Server(httpPort);
-        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
-        context.addServlet(createJAXRSServletHolder(CalcService.class,   1), "/calc/*");
-        context.addServlet(createJAXRSServletHolder(LeakService.class,   2), "/leak/*");
-        context.addServlet(createJAXRSServletHolder(EchoService.class,   3), "/echo/*");
-        context.addServlet(createJAXRSServletHolder(HealthService.class, 4), "/health/*");
-        context.addServlet(createJAXRSServletHolder(EnvService.class,    5), "/env/*");
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.NO_SESSIONS);
+        context.setContextPath("/");
+
+        // Add JAX-RS services
+        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
+        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "com.brimarx.servicebox.services");
 
         // Add both our JAX-RS service and static content to be served by the server
         HandlerList handlers = new HandlerList();
@@ -191,16 +192,6 @@ public class EmbededServer {
                 wait(slowstart);
             }
         }
-    }
-
-    // Create the embeded service with JAX-RS interface enabled
-    private ServletHolder createJAXRSServletHolder(Class clazz, int order) {
-        ServletHolder sh = new ServletHolder(ServletContainer.class);
-        sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
-        sh.setInitParameter("jersey.config.server.provider.classnames", clazz.getCanonicalName());
-        sh.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
-        sh.setInitOrder(order);
-        return sh;
     }
 
     private Server server;

@@ -20,10 +20,12 @@
  */
 package com.brimarx.servicebox.services;
 
+import com.brimarx.servicebox.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Echo REST service
@@ -32,12 +34,27 @@ import javax.ws.rs.*;
 public class EchoService
 {
     @GET
-    @Path("/{something}")
-    @Produces("text/plain")
-    public String echo(@PathParam("something") String something)
+    @Path("/{message}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Message echo(@PathParam("message") String message)
     {
-        logger.info("echo '{}'", something);
-        return something;
+        logger.info("echo '{}'", message);
+        return new Message(message);
+    }
+
+    @GET
+    @Path("/{message}/{delayms : \\d+}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Message delayedEcho(@PathParam("message") String message, @PathParam("delayms") int delayms) throws InterruptedException
+    {
+        logger.debug("delaying echo by {} ms: {}", delayms, message);
+        if (delayms > 0) {
+            synchronized(Thread.currentThread()) {
+                Thread.currentThread().wait(delayms);
+            }
+        }
+        logger.debug("delayed echo by {} ms: {}", delayms, message);
+        return new Message(message);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(EchoService.class);

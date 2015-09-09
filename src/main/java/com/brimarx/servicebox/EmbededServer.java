@@ -153,9 +153,10 @@ public class EmbededServer {
         context.setContextPath("/");
 
         // Add JAX-RS services
-        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/*");
+        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/api/v2/*");
         jerseyServlet.setInitOrder(0);
         jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "com.brimarx.servicebox.services");
+        jerseyServlet.setInitParameter("jersey.config.server.provider.classnames", "org.glassfish.jersey.moxy.json.MoxyJsonFeature");
 
         // Add both our JAX-RS service and static content to be served by the server
         HandlerList handlers = new HandlerList();

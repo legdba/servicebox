@@ -34,6 +34,6 @@ public class EchoServiceTest
     @Test
     public void testEcho()
     {
-        Assert.assertEquals(srv.echo("hello"), "hello");
+        Assert.assertEquals(srv.echo("hello").getMessage(), "hello");
     }
 }

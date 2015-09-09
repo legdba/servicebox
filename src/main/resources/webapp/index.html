@@ -5,32 +5,28 @@
   </head>
   <p>
     <p>HTTP services for testing of infra and containers.</p>
-    <h1>GET /health</h1>
+    <h1>GET /api/v2/health</h1>
     <p/>Returns "up".</p>
-    <h1>GET /health/check/{percentage}</h1>
+    <h1>GET /api/v2/health/check/{percentage}</h1>
     <p/>
       Returns "up" with {percentage} chance, or fail with an exception. {percentage} is a float number between 0 and 1.
       Usefull for health-checking scripts testing.
     </p>
-    <h1>GET /echo/{something}</h1>
+    <h1>GET /api/v2/echo/{something}</h1>
     <p/>Returns {something}.</p>
-    <h1>GET /echooo/{something}/{delayms}</h1>
+    <h1>GET /api/v2/echo/{something}/{delayms}</h1>
     <p/>Returns {something} after a {delayms} wait time.</p>
-    <h1>GET /ECHO/{something}</h1>
-    <p/>Returns {something} after CPU intensive math operations; good to cause CPU load.</p>
-    <h1>GET /calc/add/{a}/{b}</h1>
-    <p/>Returns the integer result of {a}+{b}; Both {a} and {b} must be integers.</p>
-    <h1>GET /calc/sum/{id}/{value}</h1>
+    <h1>GET /api/v2/calc/sum/{id}/{value}</h1>
     <p/>Add {value} to the accumulator in backend at ID {id} and return accumulated value.</p>
-    <h1>GET /leak/{size}</h1>
+    <h1>GET /api/v2/leak/{size}</h1>
     <p/>Leaks {size} bytes of data on Java heap and returns with a status of leaked and total leaked heap.</p>
-    <h1>GET /leak/free</h1>
+    <h1>GET /api/v2/leak/free</h1>
     <p/>Frees all retained references causing the leak. Nex GC or Full-GC can reclaim associated heap.</p>
-    <h1>GET /env/vars</h1>
+    <h1>GET /api/v2/env/vars</h1>
     <p/>Returns all system environmement variables.</p>
-    <h1>GET /env/vars/{name}</h1>
+    <h1>GET /api/v2/env/vars/{name}</h1>
     <p/>Return the value of the system environmement variable {name}.</p>
-    <h1>GET /env/hostname</h1>
+    <h1>GET /api/v2/env/hostname</h1>
     <p/>Return the value InetAddress.getLocalHost().getHostName() which is usually good enough to get the hostname.</p>
   </body>
 </html>

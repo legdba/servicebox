@@ -18,33 +18,12 @@
  # under the License.
  ##############################################################
  */
-package com.brimarx.servicebox.services;
+package com.brimarx.servicebox.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-
-/**
- * Delayed echo REST service
- */
-@Path("/echooo")
-public class EchoDelayedService
-{
-    @GET
-    @Path("/{something}/{delayms}")
-    @Produces("text/plain")
-    public String delayedEcho(@PathParam("something") String something, @PathParam("delayms") int delayms) throws InterruptedException
-    {
-        logger.debug("delayedEcho sleeping '{}'ms", delayms);
-        if (delayms > 0) {
-            synchronized(Thread.currentThread()) {
-                Thread.currentThread().wait(delayms);
-            }
-        }
-        logger.info("delayedEcho '{}' after {}ms", something, delayms);
-        return something;
-    }
-
-    private static final Logger logger = LoggerFactory.getLogger(EchoDelayedService.class);
+public class Message {
+    public Message() { }
+    public Message(String message) { this.message = message; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    String message;
 }

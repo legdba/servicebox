@@ -12,7 +12,7 @@ public class HealthServiceTest {
     @Test
     public void testCheck()
     {
-        Assert.assertEquals(srv.check(), "up");
+        Assert.assertEquals(srv.check().getMessage(), "up");
     }
 
     @Test

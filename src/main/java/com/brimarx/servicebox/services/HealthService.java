@@ -20,6 +20,7 @@
  */
 package com.brimarx.servicebox.services;
 
+import com.brimarx.servicebox.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.Random;
 
 /**
@@ -35,23 +37,29 @@ import java.util.Random;
 @Path("/health")
 public class HealthService {
     @GET
-    @Produces("text/plain")
-    public String check()
+    @Produces(MediaType.APPLICATION_JSON)
+    public Message check()
     {
-        return "up";
+        logger.info("health(100%) -> up");
+        return new Message("up");
     }
 
     @GET
     @Path("/{percentage}")
-    @Produces("text/plain")
-    public String checkOrFail(@PathParam("percentage") double percentage)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Message checkOrFail(@PathParam("percentage") double percentage)
     {
         double f = rand.nextDouble();
-        logger.info("check with percentage={} and random={}", percentage, f);
-        if (f > percentage) throw new javax.ws.rs.ServiceUnavailableException("health-check failed on purpose for testing");
-        else return "up";
+        if (f > percentage) {
+            logger.info("health({}%) -> down", percentage*100);
+            throw new javax.ws.rs.ServiceUnavailableException("health-check failed on purpose for testing");
+        }
+        else {
+            logger.info("health({}%) -> up", percentage*100);
+            return new Message("up");
+        }
     }
 
-    private static final Random rand = new Random(System.currentTimeMillis() * Runtime.getRuntime().freeMemory());
+    private static final Random rand = new Random(System.currentTimeMillis());
     private static final Logger logger = LoggerFactory.getLogger(HealthService.class);
 }

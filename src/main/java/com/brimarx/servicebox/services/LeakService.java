@@ -21,10 +21,12 @@
 package com.brimarx.servicebox.services;
 
 
+import com.brimarx.servicebox.model.RetainedHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,31 +34,26 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/leak")
 public class LeakService {
-    @OPTIONS
-    public String healthcheck() {
-        return "up";
-    }
-
     @GET
     @Path("/{size}")
-    @Produces("text/plain")
-    public String leak(@PathParam("size") int size)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RetainedHeap leak(@PathParam("size") int size)
     {
         leaks.add(ByteBuffer.allocate(size));
         long l = total.addAndGet(size);
         logger.info("leaked/total: {}/{} bytes", size, l);
-        return String.format("leaked %d bytes", size);
+        return new RetainedHeap(l);
     }
 
     @GET
     @Path("/free")
-    @Produces("text/plain")
-    public String free()
+    @Produces(MediaType.APPLICATION_JSON)
+    public RetainedHeap free()
     {
         leaks.clear();
         total.set(0);
         logger.info("released retained references");
-        return "flushed leaked references";
+        return new RetainedHeap(0);
     }
 
     private static final AtomicLong total = new AtomicLong();

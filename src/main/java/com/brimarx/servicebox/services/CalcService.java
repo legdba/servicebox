@@ -23,6 +23,8 @@ package com.brimarx.servicebox.services;
 
 import com.brimarx.servicebox.backend.Backend;
 import com.brimarx.servicebox.EmbededServer;
+import com.brimarx.servicebox.model.FiboNthResult;
+import com.brimarx.servicebox.model.Message;
 import com.brimarx.servicebox.model.SumResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,28 @@ public class CalcService {
         long sum = CalcService.backend.addAndGet(id, value);
         logger.info("new sum for {} is {}", id, sum);
         return new SumResult(id, sum);
+    }
+
+    private long calcFiboNth(long num) {
+        if (num > 2) {
+            return calcFiboNth(num - 2) + calcFiboNth(num - 1);
+        } else {
+            return 1;
+        }
+    }
+
+    @GET
+    @Path("fibo-nth/{n}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public FiboNthResult calcFiboNthRest(@PathParam("n") long n) {
+        if (n > 0) {
+            logger.info("calculating fibonacci Nth term for n={}", n);
+            long x  = calcFiboNth(n);
+            logger.info("calculated fibonacci Nth term for n={} : {}", n, x);
+            return new FiboNthResult(n, x);
+        } else {
+            throw new javax.ws.rs.NotAcceptableException("n must be a positive integer");
+        }
     }
 
     private static Backend backend;

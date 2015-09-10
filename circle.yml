@@ -12,13 +12,12 @@ dependencies:
 test:
   override:
   - ./gradlew check
-  - ./gradlew fatJar
 deployment:
   production: # just a label; label names are completely up to you
     branch: master
     commands:
-      - ./deploy_docker.sh
+      - ./build_docker.sh
   staging:
     branch: /.*/
     commands:
-      - ./deploy_docker.sh
+      - ./build_docker.sh

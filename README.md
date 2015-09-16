@@ -40,6 +40,18 @@ used to generate the image. If you run quay.io/legdba/servicebox-jaxrs:r28-bbb41
 and commit 'bbb4196'. The associated code can be seen at https://github.com/legdba/servicebox-jaxrs/commit/bbb4196
 or with a 'git bbb4196' command when in the servicebox-jaxrs repo.
 
+# Logs
+Servicebox-jaxrs writes all logs to stdout as one-line logstash default JSON documents
+(see https://github.com/logstash/logstash-logback-encoder). While this is super convenient for serious deployement
+where a log collector (logstash or another) and ElasticSearch+Kibana is used, this is not human-friendly for basic
+debugging where Kibana is not available or used.
+
+To get human readable logs simply pipe the startup command line with "es2txt" utility (requires python 2.7+).
+
+```
+java -jar build/libs/*.jar | ./ls2txt
+```
+
 # License
 This software is under Apache 2.0 license.
 

@@ -228,23 +228,18 @@ echo "=== collecting facts ==="
 APP_REVISION=$(git rev-list --count HEAD)
 APP_HASH=$(git rev-parse --short HEAD)
 APP_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "${APP_BRANCH}" == "master" ]; then
-    APP_BRANCH=""
-else
-    APP_BRANCH="-${APP_BRANCH}"
-fi
 APP_NAME=$(basename `git rev-parse --show-toplevel`)
-APP_VERSION="r${APP_REVISION}-${APP_HASH}${APP_BRANCH}"
+APP_VERSION="r${APP_REVISION}-${APP_HASH}-${APP_BRANCH}"
 APP_FULLNAME="${APP_NAME}-${APP_VERSION}"
 ARTIFACT="${APP_FULLNAME}"
 
 echo
-echo "APP_NAME                   = ${APP_NAME}"
-echo "APP_VERSION                = ${APP_VERSION}"
-echo "APP_FULLNAME               = ${APP_FULLNAME}"
-echo "APP_BRANCH (empty==master) = ${APP_BRANCH}"
-echo "ARTIFACT                   = ${ARTIFACT}"
-echo "ARTIFACTS_PATH             = ${ARTIFACTS_PATH}"
+echo "APP_NAME        = ${APP_NAME}"
+echo "APP_VERSION     = ${APP_VERSION}"
+echo "APP_FULLNAME    = ${APP_FULLNAME}"
+echo "APP_BRANCH      = ${APP_BRANCH}"
+echo "ARTIFACT        = ${ARTIFACT}"
+echo "ARTIFACTS_PATH  = ${ARTIFACTS_PATH}"
 
 ###############################################################################
 # Generate archive

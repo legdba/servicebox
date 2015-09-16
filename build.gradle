@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     compile     'org.slf4j:slf4j-api:1.7.+',
+                'net.logstash.logback:logstash-logback-encoder:4.5.1+',
                 'ch.qos.logback:logback-classic:1.1.+',
                 'org.glassfish.jersey.core:jersey-server:2.+',
                 'org.glassfish.jersey.containers:jersey-container-servlet:2.+',
@@ -87,5 +88,6 @@ task fatJar(type: Jar) {
 task buildInfo() {
     println "version : " + version
     println "appname : " + project.name
+    println "distar  : " + project.name + '-all-' + version + '.tar'
     println "fatjar  : " + project.name + '-all-' + version + '.jar'
 }

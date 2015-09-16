@@ -1,22 +1,8 @@
 <configuration scan="true">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- encoders are assigned the type
-             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-        <encoder>
-            <!--
-            Log format design to be easy to read, easy to parse with shell tool (grep, awk, ...) and easy to
-            parse with third-party logs processing tools. As such:
-            a. message is the last field
-            b. except for the message all fields have no withespaces
-            c. except for the message all fields have fixed size whenever possible
-            d. timestamp is ISO8601 which is widely supported and used all over W3C and IETF standards because it
-               solves most timestamp ambiguities and problems (and there are a LOT or them)
-            e. timestamp includes milliseconds for better accuracy; the .SSS millis fraction after seconds is ISO8601 standard
-            f. single-line (except for stack-traces)
-            -->
-            <pattern>%d{${TSPATTERN}} %-5level %-25c{25} - %msg%n</pattern>
-        </encoder>
+        <!-- https://github.com/logstash/logstash-logback-encoder -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
 
     <logger name="com.brimarx" level="${LOGLEVEL_APP}" />

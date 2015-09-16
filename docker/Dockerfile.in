@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 ##############################################################
-# Java __APP__ service for testing purpose.
+# Java __APP_FULLNAME__ service for testing purpose.
 #
 # Run server with:
 # docker run -d -p 80:8080 quay.io/legdba/httpecho:[tag]
@@ -28,8 +28,8 @@
 FROM legdba/javaw:jdk-8u51
 MAINTAINER Vincent Bourdaraud <vincent@bourdaraud.com>
 
-# Prepare for dir
-RUN mkdir /opt/__APP_FULLNAME__
+# Prepare for dir and aliases
+RUN mkdir /opt/__APP_FULLNAME__ && alias java="javaw"
 
 # Prepare for service
 WORKDIR /opt/__APP_FULLNAME__
@@ -39,8 +39,9 @@ ENTRYPOINT [\
     "-XX:OnOutOfMemoryError=kill -9 %p",\
     "-Xms50m",\
     "-Xmx50m",\
-    "-jar",\
-    "/opt/__APP__/__APP__-all.jar"\
+    "-cp",\
+    "/opt/__APP_FULLNAME__/lib/*",\
+    "com.brimarx.servicebox.EmbededServer"\
     ]
 EXPOSE 8080
 
@@ -48,6 +49,4 @@ EXPOSE 8080
 # CircleCI causing multi-copy to skip some files and store them the wrong place)
 ADD __APP_FULLNAME__.tgz /opt/__APP_FULLNAME__/
 COPY Dockerfile /opt/__APP_FULLNAME__/
-RUN sha1sum -c __APP_FULLNAME__.tgz.sha1 && \
-    ln -s __FATJAR__ __APP_FULLNAME__.jar && \
-    javaw -jar __APP_FULLNAME__.jar --help
+RUN /opt/__APP_FULLNAME__/bin/__APP_NAME__ --help

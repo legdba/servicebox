@@ -35,14 +35,14 @@ Help available the usual way:
 docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox-jaxrs:latest --help
 ```
 
-Note that in the docker registry each image is tagged with the git revision and commit of the code
-used to generate the image. If you run quay.io/legdba/servicebox-jaxrs:r28-bbb4196 this is the revision 'r28'
+Note that in the docker registry each image is tagged with the git revision, commit and branch name of the code
+used to generate the image. If you run quay.io/legdba/servicebox-jaxrs:r28-bbb4196-master this is the revision 'r28'
 and commit 'bbb4196'. The associated code can be seen at https://github.com/legdba/servicebox-jaxrs/commit/bbb4196
 or with a 'git bbb4196' command when in the servicebox-jaxrs repo.
 
 # Logs
 Servicebox-jaxrs writes all logs to stdout as one-line logstash default JSON documents
-(see https://github.com/logstash/logstash-logback-encoder). While this is super convenient for serious deployement
+(see https://github.com/logstash/logstash-logback-encoder). While this is super convenient for serious deployements
 where a log collector (logstash or another) and ElasticSearch+Kibana is used, this is not human-friendly for basic
 debugging where Kibana is not available or used.
 

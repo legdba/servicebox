@@ -320,5 +320,4 @@ then
         exe "docker tag -f ${DOCKER_IMAGE_NAME} ${DOCKER_IMAGE_LABEL}"
         exe "docker push ${DOCKER_IMAGE_LABEL}"
     fi
-    fi
 fi

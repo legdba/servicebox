@@ -31,11 +31,11 @@ PKG_DIR=""
 
 function print_help() {
     echo -e "\
-usage: [options] --type=(npm|gradle|gradle-farjar) --app-name=NAME --pkg-dir=DIR\n\
+usage: [options] --type=(npm|gradle-farjar) --app-name=NAME --pkg-dir=DIR\n\
 \n\
 Mandatory Parameters:\n\
   --type=TYPE           Build manager type, used to select the packaging\n\
-                        mechanism; shall be any of (npm|gradle|gradle-farjar)\n\
+                        mechanism; shall be any of (npm|gradle-farjar)\n\
 \n\
                         TYPE='npm'\n\
                         Packaging a npm application to a '{APP_NAME}.tgz'\n\
@@ -48,27 +48,15 @@ Mandatory Parameters:\n\
                         - application source dir must be the basedir of the\n\
                           package.json 'main' property\n\
 \n\
-                        TYPE='gradle'\n\
-                        Packaging a gradle application to a\n\
-                        '{APP_NAME}.tar' using './gradlew distTar' standard command.
-\n\
-                        REQUIREMENTS:\n\
-                        - current dir must be the gradlew script dir\n\
-                        - current dir must be the build.gradle script dir\n\
-                        - 'gradlew distTar' command must build the standard tar file\n\
-                           outputs a 'distar: {filename}' line\n\
-                        - the tar must be generated in ./build/distributions (this\n\
-                          is the default in gradle)\n\
-\n\
                         TYPE='gradle-farjar'\n\
                         Packaging a gradle fatJar application to a\n\
-                        '{APP_NAME}.tgz' which contains only the fat jar\n\
+                        '{APP_NAME}.tgz' which ocntains only the fat jar\n\
                         renamed to '{APP_NAME}.jar' and without sub dir.
 \n\
                         REQUIREMENTS:\n\
                         - current dir must be the gradlew script dir\n\
                         - current dir must be the build.gradle script dir\n\
-                        - 'gradlew fatJar' command must build the fat jar and\n\
+                        - 'gradlew fatJAr' command must build the fat jar and\n\
                            outputs a 'fatjar: {filename}' line\n\
                         - the fat jar must be generated in ./build/libs (this\n\
                           is the default in gradle)\n\
@@ -111,30 +99,7 @@ function package_npm() {
     echo "hash    : ${SHA}"
 }
 
-function package_gradle() {
-    # Build tar and get it's name
-    FN=$(./gradlew disTar | sed -n "s/ *distar *: *\(.*\)/\1/p")
-    if [ $? -ne 0 ]; then
-        exit 2
-    fi
-
-    TAR="${APP_NAME}.tar"
-    PKG="${APP_NAME}.tgz"
-    SHA="${PKG}.sha1"
-
-    # Rename, archive and sha1
-    cp ./build/distributions/${FN} ${PKG_DIR}/${PKG} || exit 3
-    cd ${PKG_DIR} || exit 3
-    gzip ${TAR} || exit 3
-    mv ${TAR}.gz ${PKG} || exit 3
-    sha1sum ${PKG} > ${SHA} || exit 3
-    cd -
-
-    echo "package : ${PKG_DIR}/${PKG}"
-    echo "hash    : ${PKG_DIR}/${SHA}"
-}
-
-}function package_gradle_fatjar() {
+function package_gradle_fatjar() {
     # Build fat jar and get it's name
     FN=$(./gradlew fatJar | sed -n "s/ *fatjar *: *\(.*\)/\1/p")
     if [ $? -ne 0 ]; then
@@ -210,9 +175,6 @@ fi
 case $TYPE in
     npm)
         package_npm
-    ;;
-    gradle)
-        package_gradle
     ;;
     gradle-fatjar)
         package_gradle_fatjar

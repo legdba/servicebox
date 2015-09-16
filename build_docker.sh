@@ -98,16 +98,8 @@ function build_archive_via_npm() {
 }
 
 # Build archive via Gradle as a fat jar
-function build_archive_via_gradle() {
-    echo "detected GRADLE build"
-    NAME=$1
-    DIR=$2
-    exe "./build_package.sh --type=gradle --app-name=${NAME} --pkg-dir=${DIR}"
-}
-
-# Build archive via Gradle as a fat jar
 function build_archive_via_gradle_fatjar() {
-    echo "detected GRADLE build (fat Jar)"
+    echo "detected GRADLE build"
     NAME=$1
     DIR=$2
     exe "./build_package.sh --type=gradle-fatjar --app-name=${NAME} --pkg-dir=${DIR}"
@@ -261,8 +253,7 @@ echo "=== generating archive ==="
 if [ -f ./package.json ]; then
     build_archive_via_npm ${ARTIFACT} ${ARTIFACTS_PATH}
 elif [ -f ./gradlew ]; then
-    #build_archive_via_gradle_fatjar ${ARTIFACT} ${ARTIFACTS_PATH}
-    build_archive_via_gradle ${ARTIFACT} ${ARTIFACTS_PATH}
+    build_archive_via_gradle_fatjar ${ARTIFACT} ${ARTIFACTS_PATH}
 else
     echo "failed to detect build framework" >&2
     exit 2

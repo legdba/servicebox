@@ -307,17 +307,18 @@ then
     DOCKER_IMAGE_LABEL="${DOCKER_IMAGE_NAME}:${APP_VERSION}"
     exe "docker tag -f ${DOCKER_IMAGE_NAME} ${DOCKER_IMAGE_LABEL}"
     exe "docker push ${DOCKER_IMAGE_LABEL}"
+
+    # Push an image with a label set to the branch name (the latest for this branch)
+    DOCKER_IMAGE_LABEL="${DOCKER_IMAGE_NAME}:${APP_BRANCH}"
+    exe "docker tag -f ${DOCKER_IMAGE_NAME} ${DOCKER_IMAGE_LABEL}"
+    exe "docker push ${DOCKER_IMAGE_LABEL}"
     
     if [ "${APP_BRANCH}" == "master" ]
     then
-        # If we are on master push and image with label 'latest'
+        # If we are on master push image with label 'latest' in addition to other labels
         DOCKER_IMAGE_LABEL="${DOCKER_IMAGE_NAME}:latest"
         exe "docker tag -f ${DOCKER_IMAGE_NAME} ${DOCKER_IMAGE_LABEL}"
         exe "docker push ${DOCKER_IMAGE_LABEL}"
-    else
-        # If we are NOT master push and image with label set to the branch name
-        DOCKER_IMAGE_LABEL="${DOCKER_IMAGE_NAME}:${APP_BRANCH}"
-        exe "docker tag -f ${DOCKER_IMAGE_NAME} ${DOCKER_IMAGE_LABEL}"
-        exe "docker push ${DOCKER_IMAGE_LABEL}"
+    fi
     fi
 fi

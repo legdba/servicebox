@@ -7,9 +7,9 @@ Toolbox of HTTP services for infra and containers testing:
 * HTTP service causing Java heap leak
 
 # Usage
-The application runs either as a fat Jar or as a Docker container.
+The application runs either as a Java app or as a Docker container.
 
-## Fat Jar
+## Java App
 Get from GIT and build:
 ```
 git clone https://github.com/legdba/servicebox-jaxrs.git && cd servicebox-jaxrs && ./gradlew check
@@ -27,7 +27,7 @@ Display help for more details (requires to pass CLI arguments which is not suppo
 ./servicebox-jaxrs --help
 ```
 
-## Docker
+## Docker App
 Latest version is always available in Quai.io and can be used as a docker application:
 ```
 docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox-jaxrs:latest
@@ -57,6 +57,41 @@ To get human readable logs simply pipe the startup command line with "es2txt" ut
 ```
 ./gradlew run | ./ls2txt
 ```
+
+# Exposed services
+### GET /api/v2/health
+Returns "{message:'up'}".
+
+###GET /api/v2/health/check/{percentage}
+Returns "{message:'up'}" with {percentage} chance, or fail with an exception. {percentage} is a float number between 0 and 1.
+Usefull for health-checking scripts testing.
+
+###GET /api/v2/echo/{something}
+Returns "{message:'something'}".
+
+###GET /api/v2/echo/{something}/{delayms}
+Returns "{message:'something'}" after a {delayms} wait time.
+
+###GET /api/v2/calc/sum/{id}/{value}
+Add {value} to the accumulator in backend at ID {id} and return accumulated value. The backend is by default the Java instance memory but can be configured to be a Cassandra cluster by setting up the "--be-type cassandra --be-opts node_ip" (as of today only one Cassandra node can be set).
+
+###GET /api/v2/calc/fibo-nth/{n}
+Calculate [n]th term of fibonnaci; this is rather CPU intensive with n > 50.
+
+###GET /api/v2/leak/{size}
+Leaks {size} bytes of data on Java heap and returns with a status of leaked and total leaked heap.
+
+###GET /api/v2/leak/free
+Frees all retained references causing the leak. Nex GC or Full-GC can reclaim associated heap.
+
+###GET /api/v2/env/vars
+Returns all system environmement variables in a JSON map.
+
+###GET /api/v2/env/vars/{name}
+Return the value of the system environmement variable {name}.
+
+###GET /api/v2/env/hostname
+Return the value InetAddress.getLocalHost().getHostName() which is usually good enough as a hostname.
 
 # License
 This software is under Apache 2.0 license.

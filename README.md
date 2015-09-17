@@ -59,6 +59,10 @@ To get human readable logs simply pipe the startup command line with "es2txt" ut
 ```
 
 # Exposed services
+
+Get Swagger definition at http://yourhost:8080/api/v2/swagger.yaml
+Get Swagger-UI at http://yourhost:8080/docs/ (mind the final '/').
+
 ### GET /api/v2/health
 Returns "{message:'up'}".
 

@@ -26,6 +26,8 @@ import com.brimarx.servicebox.EmbededServer;
 import com.brimarx.servicebox.model.FiboNthResult;
 import com.brimarx.servicebox.model.Message;
 import com.brimarx.servicebox.model.SumResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/calc")
+@Api(value = "/calc", description = "Calculations")
 public class CalcService {
 
     public static void setBackend(Backend be) { backend = be; } // TODO: fix this ugly hack and have proper injection setup
@@ -40,6 +43,7 @@ public class CalcService {
     @GET
     @Path("sum/{id}/{value}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Statefull sum", notes = "Sum {value} to {id} counter in backend and return the new value", response = SumResult.class)
     public SumResult sum(@PathParam("id") String id, @PathParam("value") int value)
     {
         long sum = CalcService.backend.addAndGet(id, value);
@@ -58,6 +62,7 @@ public class CalcService {
     @GET
     @Path("fibo-nth/{n}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Compute the n-th term of fibonacci", notes = "Compute the n-th term of fibonacci which is CPU intensive, expecially if {n} > 50", response = FiboNthResult.class)
     public FiboNthResult calcFiboNthRest(@PathParam("n") long n) {
         if (n > 0) {
             logger.info("calculating fibonacci Nth term for n={}", n);

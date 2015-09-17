@@ -29,18 +29,23 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.brimarx.servicebox.backend.BackendFactory;
 import com.brimarx.servicebox.services.*;
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.listing.ApiListingResource;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 public class EmbededServer {
     public static void main(String[] args) {
@@ -134,28 +139,19 @@ public class EmbededServer {
     }
 
     private void initJetty() {
-        // Expose the resources/webdav directory static content with / as a basedir
-        ResourceHandler rh = new ResourceHandler();
-        rh.setDirectoriesListed(true);rh.setWelcomeFiles(new String[]{"index.html"});
-        java.net.URL webappResource = EmbededServer.class.getClassLoader().getResource("webapp");
-        if (webappResource == null) throw new IllegalStateException("webapp resource not found");
-        String webDir = webappResource.toExternalForm();
-        rh.setResourceBase(webDir);
-
         // Create server
         server = new Server(httpPort);
         ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
 
-        // Add JAX-RS services
-        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/api/v2/*");
-        jerseyServlet.setInitOrder(0);
-        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "com.brimarx.servicebox.services");
-        jerseyServlet.setInitParameter("jersey.config.server.provider.classnames", "org.glassfish.jersey.moxy.json.MoxyJsonFeature");
+        // Add Swagger
+        initSwagger();
 
         // Add both our JAX-RS service and static content to be served by the server
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { rh, context, new DefaultHandler() });
+        handlers.addHandler(buildSwaggerUI());
+        handlers.addHandler(buildContext());
+        handlers.addHandler(new DefaultHandler());
         server.setHandler(handlers);
 
         // Set graceful shutdown limited to 1sec
@@ -187,6 +183,46 @@ public class EmbededServer {
             synchronized(this) {
                 wait(slowstart);
             }
+        }
+    }
+
+    private void initSwagger()
+    {
+        // This configures Swagger
+        BeanConfig beanConfig = new BeanConfig();
+        beanConfig.setVersion( "1.0.0" );
+        beanConfig.setResourcePackage( EchoService.class.getPackage().getName() );
+        beanConfig.setScan( true );
+        beanConfig.setBasePath( "/" );
+        beanConfig.setDescription( "REST server exposing test services" );
+        beanConfig.setTitle( "ServiceBox-JAXRS" );
+    }
+
+    private ContextHandler buildContext()
+    {
+        ResourceConfig resourceConfig = new ResourceConfig();
+        // io.swagger.jaxrs.listing loads up Swagger resources
+        resourceConfig.packages(EchoService.class.getPackage().getName(), ApiListingResource.class.getPackage().getName());
+        ServletContainer servletContainer = new ServletContainer( resourceConfig );
+        ServletHolder sh = new ServletHolder( servletContainer );
+        ServletContextHandler entityBrowserContext = new ServletContextHandler( ServletContextHandler.NO_SESSIONS );
+        entityBrowserContext.setContextPath("/api/v2");
+        entityBrowserContext.addServlet(sh, "/*");
+
+        return entityBrowserContext;
+    }
+
+    private ContextHandler buildSwaggerUI()
+    {
+        try {
+            final ResourceHandler swaggerUIResourceHandler = new ResourceHandler();
+            swaggerUIResourceHandler.setResourceBase(EmbededServer.class.getClassLoader().getResource("swaggerui").toURI().toString());
+            final ContextHandler swaggerUIContext = new ContextHandler();
+            swaggerUIContext.setContextPath("/docs/");
+            swaggerUIContext.setHandler(swaggerUIResourceHandler);
+            return swaggerUIContext;
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
         }
     }
 

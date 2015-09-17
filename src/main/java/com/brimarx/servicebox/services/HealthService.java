@@ -21,6 +21,8 @@
 package com.brimarx.servicebox.services;
 
 import com.brimarx.servicebox.model.Message;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +33,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Random;
 
-/**
- * Created by vincent on 16/08/15.
- */
 @Path("/health")
+@Api(value = "/health", description = "Health check service")
 public class HealthService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return a 'up' message", notes = "Return a 'up' message", response = Message.class)
     public Message check()
     {
         logger.info("health(100%) -> up");
@@ -47,6 +48,7 @@ public class HealthService {
     @GET
     @Path("/{percentage}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return a 'up' message {percentage}% time", notes = "Return a 'up' message with a {percent}% chance, return an error otherwise", response = Message.class)
     public Message checkOrFail(@PathParam("percentage") double percentage)
     {
         double f = rand.nextDouble();

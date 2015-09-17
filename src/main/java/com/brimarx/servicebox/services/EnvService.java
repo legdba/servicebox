@@ -20,6 +20,9 @@
  */
 package com.brimarx.servicebox.services;
 
+import com.brimarx.servicebox.model.Message;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +35,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Path("/env")
+@Api(value = "/env", description = "Display REST server environment")
 public class EnvService {
     @GET
     @Path("/vars")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return all server ENV variables", notes = "Return variable as a map of string:string", response = Map.class)
     public Map<String,String> vars() {
         logger.info("returning env");
         return System.getenv();
@@ -44,6 +49,7 @@ public class EnvService {
     @GET
     @Path("/vars/{name}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return the server ENV value for variable {name}", notes = "Return as a map of string:string", response = Map.class)
     public Map<String,String> var(@PathParam("name") String name) {
         String val = System.getenv().get(name);
         if (val == null) throw new NotFoundException(name);
@@ -56,6 +62,7 @@ public class EnvService {
     @GET
     @Path("/hostname")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return the server hostname", notes = "Return InetAddress.getLocalHost().getHostName() value", response = Map.class)
     public Map<String,String> hostanme() throws UnknownHostException {
         Map<String,String> map = new HashMap<String,String>();
         map.put("hostname", InetAddress.getLocalHost().getHostName());

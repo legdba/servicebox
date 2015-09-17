@@ -22,6 +22,8 @@ package com.brimarx.servicebox.services;
 
 
 import com.brimarx.servicebox.model.RetainedHeap;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +35,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/leak")
+@Api(value = "/leak", description = "Force a Heap leak")
 public class LeakService {
     @GET
     @Path("/{size}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Leak {size} bytes", notes = "Leak {size} bytes and return the total number of cummulated leaked bytes", response = RetainedHeap.class)
     public RetainedHeap leak(@PathParam("size") int size)
     {
         leaks.add(ByteBuffer.allocate(size));
@@ -48,6 +52,7 @@ public class LeakService {
     @GET
     @Path("/free")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Free all leaked references", notes = "All leaked references will be subject to GC", response = RetainedHeap.class)
     public RetainedHeap free()
     {
         leaks.clear();

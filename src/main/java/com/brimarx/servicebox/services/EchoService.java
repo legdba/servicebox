@@ -21,21 +21,22 @@
 package com.brimarx.servicebox.services;
 
 import com.brimarx.servicebox.model.Message;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-/**
- * Echo REST service
- */
 @Path("/echo")
+@Api(value = "/echo", description = "Echo back received param")
 public class EchoService
 {
     @GET
     @Path("/{message}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return back message", notes = "Return back message", response = Message.class)
     public Message echo(@PathParam("message") String message)
     {
         logger.info("echo '{}'", message);
@@ -45,6 +46,7 @@ public class EchoService
     @GET
     @Path("/{message}/{delayms : \\d+}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return back message after {delayms} milliseconds", notes = "Return back message after {delayms} milliseconds", response = Message.class)
     public Message delayedEcho(@PathParam("message") String message, @PathParam("delayms") int delayms) throws InterruptedException
     {
         logger.debug("delaying echo by {} ms: {}", delayms, message);

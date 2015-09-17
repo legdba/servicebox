@@ -12,11 +12,11 @@ The application runs either as a fat Jar or as a Docker container.
 ## Fat Jar
 Get from GIT and build:
 ```
-git clone https://github.com/legdba/servicebox-jaxrs.git && cd servicebox-jaxrs && ./gradlew check fatJar
+git clone https://github.com/legdba/servicebox-jaxrs.git && cd servicebox-jaxrs && ./gradlew check
 ```
 Then run the app as a fat jar:
 ```
-java -jar build/libs/*.jar
+./gradlew run
 ```
 Then connect to http://localhost:8080/ and see the description of the exposed services.
 

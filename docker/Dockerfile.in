@@ -28,24 +28,22 @@
 FROM legdba/javaw:jdk-8u51
 MAINTAINER Vincent Bourdaraud <vincent@bourdaraud.com>
 
-# Prepare for dir
-RUN mkdir /opt/__APP_FULLNAME__
-
 # Prepare for service
-WORKDIR /opt/__APP_FULLNAME__
+ENV JAVA_OPTS="-Xms50m -Xmx50m"
 CMD ["-p", "8080"]
 ENTRYPOINT [\
     "javaw",\
-    "-XX:OnOutOfMemoryError=kill -9 %p",\
-    "-Xms50m",\
-    "-Xmx50m",\
-    "-jar",\
-    "/opt/__APP_FULLNAME__/__APP_FULLNAME__.jar"\
+    "-cp",\
+    "/opt/__APP_FULLNAME__/lib/*",\
+    "com.brimarx.servicebox.EmbededServer"\
     ]
 EXPOSE 8080
 
-# Add Java App (copy one by one because of a bug on Docker 1.2-circleci on
-# CircleCI causing multi-copy to skip some files and store them the wrong place)
-ADD __APP_FULLNAME__.tgz /opt/__APP_FULLNAME__/
+# Add Java App
+WORKDIR /opt/__APP_FULLNAME__
+ADD __APP_FULLNAME__.tgz /opt/
 COPY Dockerfile /opt/__APP_FULLNAME__/
-RUN javaw -jar /opt/__APP_FULLNAME__/__APP_FULLNAME__.jar --help
+# Remove gradle wrapper script since it does not work fine with Alpine
+RUN rm -rf /opt/__APP_FULLNAME__/bin
+# Test we can start the app
+RUN javaw -cp '/opt/__APP_FULLNAME__/lib/*' com.brimarx.servicebox.EmbededServer --help

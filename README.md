@@ -14,7 +14,7 @@ Get from GIT and build:
 ```
 git clone https://github.com/legdba/servicebox-jaxrs.git && cd servicebox-jaxrs && ./gradlew check
 ```
-Then run the app as a fat jar:
+Then run the app:
 ```
 ./gradlew run
 ```

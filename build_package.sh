@@ -31,7 +31,7 @@ PKG_DIR=""
 
 function print_help() {
     echo -e "\
-usage: [options] --type=(npm|gradle-farjar) --app-name=NAME --pkg-dir=DIR\n\
+usage: [options] --type=(npm|gradle-disttar) --app-name=NAME --pkg-dir=DIR\n\
 \n\
 Mandatory Parameters:\n\
   --type=TYPE           Build manager type, used to select the packaging\n\
@@ -99,22 +99,22 @@ function package_npm() {
     echo "hash    : ${SHA}"
 }
 
-function package_gradle_fatjar() {
+function package_gradle_disttar() {
     # Build fat jar and get it's name
-    FN=$(./gradlew fatJar | sed -n "s/ *fatjar *: *\(.*\)/\1/p")
+    FN=$(./gradlew distTar | sed -n "s/ *disttar *: *\(.*\)/\1/p")
     if [ $? -ne 0 ]; then
         exit 2
     fi
 
-    JAR="${APP_NAME}.jar"
+    TAR="${APP_NAME}.tar"
     PKG="${APP_NAME}.tgz"
     SHA="${PKG}.sha1"
 
     # Rename, archive and sha1
-    cp ./build/libs/${FN} ${PKG_DIR}/${JAR} || exit 3
+    cp ./build/distributions/${FN} ${PKG_DIR}/${TAR} || exit 3
     cd ${PKG_DIR} || exit 3
-    tar cvf ${PKG} ${JAR} || exit 3
-    rm ${JAR} || exit 3
+    gzip ${TAR} || exit 3
+    mv ${TAR}.gz ${PKG} || exit 3
     sha1sum ${PKG} > ${SHA} || exit 3
     cd -
 
@@ -176,8 +176,8 @@ case $TYPE in
     npm)
         package_npm
     ;;
-    gradle-fatjar)
-        package_gradle_fatjar
+    gradle-disttar)
+        package_gradle_disttar
     ;;
     *)
         echo "invalid type $TYPE" >&2

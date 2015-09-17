@@ -6,9 +6,8 @@ apply plugin: 'maven'
 ext.revision = 'git rev-list --count HEAD'.execute().text.trim()
 ext.hash = 'git rev-parse --short HEAD'.execute().text.trim()
 ext.branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
-if (ext.branch == 'master') { ext.branch = '' } else { ext.branch = '-' + ext.branch }
 group = 'com.brimarx'
-version = "r${revision}-${hash}${ext.branch}"
+version = "r${revision}-${hash}-${ext.branch}"
 description = """REST services for demo and test purpose."""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -73,20 +72,8 @@ test {
 
 mainClassName = 'com.brimarx.servicebox.EmbededServer'
 
-//create a single Jar with all dependencies
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File Example',  
-                   'Implementation-Version': version,
-                   'Main-Class': mainClassName
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
 task buildInfo() {
     println "version : " + version
     println "appname : " + project.name
-    println "fatjar  : " + project.name + '-all-' + version + '.jar'
+    println "disttar : " + project.name + '-' + version + '.tar'
 }

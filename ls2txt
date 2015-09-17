@@ -52,7 +52,7 @@ def display(line):
     try:
         display_json(line)
     except Exception,e:
-        print e
+        #print e
         display_raw(line)
 
 ###############################################################################

@@ -20,9 +20,11 @@ Then run the app as a fat jar:
 ```
 Then connect to http://localhost:8080/ and see the description of the exposed services.
 
-Display help for more details:
+Display help for more details (requires to pass CLI arguments which is not supported by gradle):
 ```
-java -jar build/libs/*.jar --help
+./gradlew distTar
+[untar the build/distributions/ tar anywhere convenient; move to the bin/ directory expendedt]
+./servicebox-jaxrs --help
 ```
 
 ## Docker
@@ -33,6 +35,10 @@ docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox-jaxrs:latest
 Help available the usual way:
 ```
 docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox-jaxrs:latest --help
+```
+JAVA_OPTS can be set from docker this way (it will erase the defaults):
+```
+docker run -ti -p :8080:8080 -e "JAVA_OPTS=-Xmx100m" --rm=true quay.io/legdba/servicebox-jaxrs:latest --help
 ```
 
 Note that in the docker registry each image is tagged with the git revision, commit and branch name of the code
@@ -49,7 +55,7 @@ debugging where Kibana is not available or used.
 To get human readable logs simply pipe the startup command line with "es2txt" utility (requires python 2.7+).
 
 ```
-java -jar build/libs/*.jar | ./ls2txt
+./gradlew run | ./ls2txt
 ```
 
 # License

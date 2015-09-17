@@ -29,16 +29,14 @@ dependencies {
                 'io.swagger:swagger-jersey2-jaxrs:1.5.+',
                 'org.glassfish.jersey.core:jersey-server:2.+',
                 'org.glassfish.jersey.containers:jersey-container-servlet:2.+',
-                'org.glassfish.jersey.media:jersey-media-json-jackson:2.21',
+                'org.glassfish.jersey.media:jersey-media-json-jackson:2.+',
                 'org.eclipse.jetty:jetty-server:9.2.3.v20140905',
                 'org.eclipse.jetty:jetty-servlet:9.2.3.v20140905',
-                'com.beust:jcommander:1.48',
-                'com.datastax.cassandra:cassandra-driver-core:2.2.0-rc2'
+                'com.beust:jcommander:1.+',
+                'com.datastax.cassandra:cassandra-driver-core:2.2.+'
 
     testCompile 'org.testng:testng:6.+',
-                'org.uncommons:reportng:1.1.4',
-                // workaround for a known issue with TestNG 6.x: explicitly add Guice (Gradle will fail to run tests otherwise)
-                'com.google.inject:guice:3.0'
+                'org.uncommons:reportng:1.+'
 }
 
 // ensure that test resources (src/test/resources) are added to CLASSPATH;

@@ -188,14 +188,14 @@ public class EmbededServer {
 
     private void initSwagger()
     {
-        // This configures Swagger
         BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setVersion( "1.0.0" );
-        beanConfig.setResourcePackage( EchoService.class.getPackage().getName() );
-        beanConfig.setScan( true );
-        beanConfig.setBasePath( "/" );
-        beanConfig.setDescription( "REST server exposing test services" );
-        beanConfig.setTitle( "ServiceBox-JAXRS" );
+        beanConfig.setVersion("2.0");
+        beanConfig.setResourcePackage(EchoService.class.getPackage().getName());
+        beanConfig.setScan(true);
+        beanConfig.setBasePath("/api/v2");
+        beanConfig.setDescription("REST server exposing test services"); // BUG: Swagger 1.5.3 ignores this; waiting for a fix
+        beanConfig.setLicense("Apache-2");                               // BUG: Swagger 1.5.3 ignores this; waiting for a fix
+        beanConfig.setTitle("ServiceBox-JAXRS");                         // BUG: Swagger 1.5.3 ignores this; waiting for a fix
     }
 
     private ContextHandler buildContext()
@@ -208,7 +208,6 @@ public class EmbededServer {
         ServletContextHandler entityBrowserContext = new ServletContextHandler( ServletContextHandler.NO_SESSIONS );
         entityBrowserContext.setContextPath("/api/v2");
         entityBrowserContext.addServlet(sh, "/*");
-
         return entityBrowserContext;
     }
 

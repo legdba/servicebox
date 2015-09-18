@@ -20,7 +20,6 @@
  */
 package com.brimarx.servicebox.services;
 
-
 import com.brimarx.servicebox.model.RetainedHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-/**
- * Echo REST service
- */
 @Path("/echo")
 public class EchoService
 {

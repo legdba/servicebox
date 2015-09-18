@@ -31,9 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Random;
 
-/**
- * Created by vincent on 16/08/15.
- */
 @Path("/health")
 public class HealthService {
     @GET

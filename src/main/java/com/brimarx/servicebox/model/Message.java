@@ -20,10 +20,22 @@
  */
 package com.brimarx.servicebox.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Message {
     public Message() { }
     public Message(String message) { this.message = message; }
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
     String message;
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }

@@ -34,6 +34,7 @@ dependencies {
                 'org.eclipse.jetty:jetty-servlet:9.2.3.v20140905',
                 'com.beust:jcommander:1.+',
                 'com.datastax.cassandra:cassandra-driver-core:2.2.+'
+                'org.glassfish.jersey.core:jersey-client:2.+' // for JAX-RS client
 
     testCompile 'org.testng:testng:6.+',
                 'org.uncommons:reportng:1.+'
@@ -70,6 +71,7 @@ test {
 }
 
 mainClassName = 'com.brimarx.servicebox.EmbededServer'
+//mainClassName = 'com.brimarx.servicebox.DemoClient'
 
 task buildInfo() {
     println "version : " + version

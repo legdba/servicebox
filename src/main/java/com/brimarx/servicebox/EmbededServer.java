@@ -31,7 +31,6 @@ import com.brimarx.servicebox.backend.BackendFactory;
 import com.brimarx.servicebox.services.*;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -66,7 +65,7 @@ public class EmbededServer {
     private static final int    DEFAULT_HTTP_PORT         = 8080;
     private static final String DEFAULT_APP_LOG_LEVEL     = "info";
     private static final String DEFAULT_SRV_LOG_LEVEL     = "warn";
-    private static final String DEFAULT_BE_OPTS_CASSANDRA = "127.0.0.1";
+    private static final String DEFAULT_BE_OPTS_CASSANDRA = "{\"contactPoints\":[\"localhost:9042\"]}";
 
     @Parameter(names={"-h", "--help"}, description = "display help")
     private boolean help = false;
@@ -134,7 +133,7 @@ public class EmbededServer {
     }
 
     private void initBackend() {
-        if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && beEndpoint == null) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
+        if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && (beEndpoint == null || beEndpoint.trim().isEmpty())) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
         CalcService.setBackend(BackendFactory.build(beType, beEndpoint));
     }
 

@@ -21,20 +21,20 @@
 package com.brimarx.servicebox.backend;
 
 import com.datastax.driver.core.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by vincent on 04/08/15.
- */
 // CREATE KEYSPACE calc WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 } AND DURABLE_WRITES = false ;
 // CREATE TABLE calc.sum (id varchar, sum counter, PRIMARY KEY(id)) ;
 // UPDATE calc.sum SET sum=sum+1 WHERE id='0' ;
 // SELECT * FROM calc.sum WHERE id='0' ;
 public class CassandraBackend implements Backend {
-    public CassandraBackend(String contactPoint) {
-        logger.info("connecting to cluster at '{}'", contactPoint);
-        cluster = Cluster.builder().addContactPoint(contactPoint).build();
+    public CassandraBackend(CassandraConfig cfg) {
+        logger.info("connecting to cluster at '{}'", cfg);
+        Cluster.Builder builder = Cluster.builder();
+        cfg.getContactPoints().forEach((contactPoint) -> builder.addContactPoint(contactPoint));
+        cluster = builder.build();
         session = cluster.connect("calc");
 
         logger.info("preparing statements");

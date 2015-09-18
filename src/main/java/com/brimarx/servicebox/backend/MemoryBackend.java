@@ -23,9 +23,6 @@ package com.brimarx.servicebox.backend;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by vincent on 04/08/15.
- */
 public class MemoryBackend implements Backend {
     public long addAndGet(String id, long value) {
         long sum = 0;

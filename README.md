@@ -66,7 +66,7 @@ Get Swagger-UI at http://yourhost:8080/docs/ (mind the final '/').
 ### GET /api/v2/health
 Returns "{message:'up'}".
 
-###GET /api/v2/health/check/{percentage}
+###GET /api/v2/health/{percentage}
 Returns "{message:'up'}" with {percentage} chance, or fail with an exception. {percentage} is a float number between 0 and 1.
 Usefull for health-checking scripts testing.
 

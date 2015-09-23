@@ -5,7 +5,8 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
 
-    <logger name="com.brimarx" level="${LOGLEVEL_APP}" />
+    <logger name="com.brimarx"      level="${LOGLEVEL_APP}" />
+    <logger name="transaction-logs" level="${LOGLEVEL_APP}" />
 
     <root level="${LOGLEVEL_SRV}">
         <appender-ref ref="STDOUT" />

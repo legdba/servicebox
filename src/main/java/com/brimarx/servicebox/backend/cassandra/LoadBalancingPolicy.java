@@ -18,23 +18,38 @@
  # under the License.
  ##############################################################
  */
-package com.brimarx.servicebox.backend;
+package com.brimarx.servicebox.backend.cassandra;
 
-import com.brimarx.servicebox.backend.Backend;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
-import java.util.Map;
+public class LoadBalancingPolicy {
 
-public class MemoryBackend implements Backend {
-    public long addAndGet(String id, long value) {
-        long sum = 0;
-        synchronized(sums) {
-            if (sums.containsKey(id)) sum = sums.get(id);
-            sum += value;
-            sums.put(id, sum);
-        }
-        return sum;
+    public String getLocalDC() {
+        return localDC;
     }
 
-    private final Map<String, Long> sums = new HashMap<>();
+    public void setLocalDC(String localDC) {
+        this.localDC = localDC;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private String localDC;
+    private String type;
 }

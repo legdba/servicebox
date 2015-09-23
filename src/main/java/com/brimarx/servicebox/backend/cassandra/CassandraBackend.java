@@ -18,10 +18,11 @@
  # under the License.
  ##############################################################
  */
-package com.brimarx.servicebox.backend;
+package com.brimarx.servicebox.backend.cassandra;
 
+import com.brimarx.servicebox.backend.Backend;
 import com.datastax.driver.core.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +30,23 @@ import org.slf4j.LoggerFactory;
 // CREATE TABLE calc.sum (id varchar, sum counter, PRIMARY KEY(id)) ;
 // UPDATE calc.sum SET sum=sum+1 WHERE id='0' ;
 // SELECT * FROM calc.sum WHERE id='0' ;
+// --be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "authProvider":{"type":"PlainTextAuthProvider", "username":"username", "password":"password"}, "loadBalancingPolicy":{"type":"DCAwareRoundRobinPolicy", "localDC":"AWS_VPC_US_WEST_2"}}'
 public class CassandraBackend implements Backend {
+
+    public static final String AUTHPROVIDER_PLAINTEXT = "PlainTextAuthProvider";
+    public static final String LOADBALANCINGPOLICY_DCAWAREROUNDROBIN = "DCAwareRoundRobinPolicy";
+
     public CassandraBackend(CassandraConfig cfg) {
-        logger.info("connecting to cluster at '{}'", cfg);
         Cluster.Builder builder = Cluster.builder();
-        cfg.getContactPoints().forEach((contactPoint) -> builder.addContactPoint(contactPoint));
+        builder = withContactPoints(builder, cfg);
+        builder = withAuthProvider(builder, cfg);
+        builder = withLoadBalancingPolicy(builder, cfg);
         cluster = builder.build();
+
+        logger.info("connecting to cluster at '{}'", cfg);
         session = cluster.connect("calc");
 
-        logger.info("preparing statements");
+        logger.debug("preparing statements...");
         sumPS = session.prepare("UPDATE sum SET sum=sum+:value WHERE id=:id");
         getPS = session.prepare("SELECT * FROM calc.sum WHERE id=:id");
     }
@@ -62,6 +71,39 @@ public class CassandraBackend implements Backend {
     @Override
     public String toString() {
         return session.toString();
+    }
+
+    private static Cluster.Builder withContactPoints(Cluster.Builder builder, CassandraConfig cfg) {
+        for (String contactPoint  : cfg.getContactPoints()) {
+            builder = builder.addContactPoint(contactPoint);
+        }
+        return builder;
+    }
+
+    private static Cluster.Builder withAuthProvider(Cluster.Builder builder, CassandraConfig cfg) {
+        if (cfg.getAuthProvider() != null) {
+            if (AUTHPROVIDER_PLAINTEXT.equalsIgnoreCase(cfg.getAuthProvider().getType())) {
+                String username = cfg.getAuthProvider().getUsername();
+                String password = cfg.getAuthProvider().getPassword();
+                return builder.withAuthProvider(new PlainTextAuthProvider(username, password));
+            } else {
+                throw new IllegalArgumentException("invalid Cassandra authProvider: " + cfg.getAuthProvider().getType());
+            }
+        } else {
+            return builder;
+        }
+    }
+
+    private static Cluster.Builder withLoadBalancingPolicy(Cluster.Builder builder, CassandraConfig cfg) {
+        if (cfg.getLoadBalancingPolicy() != null) {
+            if (LOADBALANCINGPOLICY_DCAWAREROUNDROBIN.equalsIgnoreCase(cfg.getLoadBalancingPolicy().getType())) {
+                return builder.withLoadBalancingPolicy(new DCAwareRoundRobinPolicy(cfg.getLoadBalancingPolicy().getLocalDC()));
+            } else {
+                throw new IllegalArgumentException("invalid Cassandra loadBalancingPolicy: " + cfg.getLoadBalancingPolicy().getType());
+            }
+        } else {
+            return builder;
+        }
     }
 
     private final Cluster cluster;

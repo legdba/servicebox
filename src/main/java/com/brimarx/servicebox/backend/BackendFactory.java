@@ -20,8 +20,8 @@
  */
 package com.brimarx.servicebox.backend;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.brimarx.servicebox.backend.cassandra.CassandraBackend;
+import com.brimarx.servicebox.backend.cassandra.CassandraConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;

@@ -20,9 +20,12 @@
  */
 package com.brimarx.servicebox.backend;
 
-/**
- * Created by vincent on 04/08/15.
- */
+import com.brimarx.servicebox.backend.cassandra.CassandraBackend;
+import com.brimarx.servicebox.backend.cassandra.CassandraConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+
 public class BackendFactory {
     public static final String TYPE_MEMORY    = "memory";
     public static final String TYPE_CASSANDRA = "cassandra";
@@ -38,6 +41,12 @@ public class BackendFactory {
     }
 
     private static Backend buildCassandra(String connectivity) {
-        return new CassandraBackend(connectivity);
+        try {
+            ObjectMapper om = new ObjectMapper();
+            CassandraConfig cfg = om.readValue(connectivity, CassandraConfig.class);
+            return new CassandraBackend(cfg);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("invalid be connectivity '" + connectivity + "' : " + e, e);
+        }
     }
 }

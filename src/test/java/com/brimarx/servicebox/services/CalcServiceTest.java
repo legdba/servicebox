@@ -21,7 +21,6 @@
 package com.brimarx.servicebox.services;
 
 import com.brimarx.servicebox.backend.MemoryBackend;
-import com.brimarx.servicebox.services.CalcService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

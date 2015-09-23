@@ -30,8 +30,8 @@ dependencies {
                 'org.glassfish.jersey.core:jersey-server:2.+',
                 'org.glassfish.jersey.containers:jersey-container-servlet:2.+',
                 'org.glassfish.jersey.media:jersey-media-json-jackson:2.+',
-                'org.eclipse.jetty:jetty-server:9.2.3.v20140905',
-                'org.eclipse.jetty:jetty-servlet:9.2.3.v20140905',
+                'org.eclipse.jetty:jetty-server:9.3.3.v20150827',
+                'org.eclipse.jetty:jetty-servlet:9.3.3.v20150827',
                 'com.beust:jcommander:1.+',
                 'com.datastax.cassandra:cassandra-driver-core:2.2.+'
                 'org.glassfish.jersey.core:jersey-client:2.+' // for JAX-RS client

@@ -58,6 +58,25 @@ To get human readable logs simply pipe the startup command line with "es2txt" ut
 ./gradlew run | ./ls2txt
 ```
 
+## Using a Backend
+
+### Memory
+This is the default. No configuration needed.
+
+### Cassandra
+To use cassandra as a backend add the following options:
+```
+--be-type=cassandra --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"]}'
+```
+Plain-text credentials can be set this way (no other credentials supported so far):
+```
+--be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "authProvider":{"type":"PlainTextAuthProvider", "username":"username", "password":"p@ssword"}}'
+```
+Set load balancing policies:
+```
+--be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "loadBalancingPolicy":{"type":"DCAwareRoundRobinPolicy","localDC":"DC_name_"}}'
+```
+
 # Exposed services
 
 Get Swagger definition at http://yourhost:8080/api/v2/swagger.yaml
@@ -89,10 +108,10 @@ Leaks {size} bytes of data on Java heap and returns with a status of leaked and 
 Frees all retained references causing the leak. Nex GC or Full-GC can reclaim associated heap.
 
 ###GET /api/v2/env/vars
-Returns all system environmement variables in a JSON map.
+Returns all system environment variables in a JSON map.
 
 ###GET /api/v2/env/vars/{name}
-Return the value of the system environmement variable {name}.
+Return the value of the system environment variable {name}.
 
 ###GET /api/v2/env/hostname
 Return the value InetAddress.getLocalHost().getHostName() which is usually good enough as a hostname.

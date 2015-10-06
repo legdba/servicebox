@@ -58,6 +58,10 @@ To get human readable logs simply pipe the startup command line with "es2txt" ut
 ./gradlew run | ./ls2txt
 ```
 
+Transaction logs are sent to stdout as JSON documents as well:
+- Pure JSON transaction log set with logger 'transaction-logs.json' and JSON attributes for each field (all prefixed with 'txn.')
+- NCSA logs in the message field of the JSON logs and set with logger 'transaction-logs.ncsa'
+
 ## Using a Backend
 
 ### Memory
@@ -76,6 +80,18 @@ Set load balancing policies:
 ```
 --be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "loadBalancingPolicy":{"type":"DCAwareRoundRobinPolicy","localDC":"DC_name_"}}'
 ```
+
+### Redis-cluster
+To use a redis cluster as a backend add the following options:
+```
+--be-type=redis-cluster --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"]}'
+```
+Plain-text credentials can be set this way:
+```
+--be-type=redis-cluster --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"],"password":"p@ssword"}'
+```
+
+Only redis v3 cluster is supported as of today. Plain old redis instances are not supported.
 
 # Exposed services
 

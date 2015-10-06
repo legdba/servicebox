@@ -26,6 +26,10 @@ import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+import java.util.Collection;
+import java.util.LinkedList;
+
 // CREATE KEYSPACE calc WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 } AND DURABLE_WRITES = false ;
 // CREATE TABLE calc.sum (id varchar, sum counter, PRIMARY KEY(id)) ;
 // UPDATE calc.sum SET sum=sum+1 WHERE id='0' ;
@@ -33,6 +37,7 @@ import org.slf4j.LoggerFactory;
 // --be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "authProvider":{"type":"PlainTextAuthProvider", "username":"username", "password":"password"}, "loadBalancingPolicy":{"type":"DCAwareRoundRobinPolicy", "localDC":"AWS_VPC_US_WEST_2"}}'
 public class CassandraBackend implements Backend {
 
+    public static final int DEFAULT_PORT = 9042;
     public static final String AUTHPROVIDER_PLAINTEXT = "PlainTextAuthProvider";
     public static final String LOADBALANCINGPOLICY_DCAWAREROUNDROBIN = "DCAwareRoundRobinPolicy";
 
@@ -49,6 +54,10 @@ public class CassandraBackend implements Backend {
         logger.debug("preparing statements...");
         sumPS = session.prepare("UPDATE sum SET sum=sum+:value WHERE id=:id");
         getPS = session.prepare("SELECT * FROM calc.sum WHERE id=:id");
+
+        logger.info("testing backend with a sum('0', 0) request");
+        addAndGet("0", 0);
+        logger.info("backend test passed");
     }
 
     public long addAndGet(String id, long value) {
@@ -74,9 +83,12 @@ public class CassandraBackend implements Backend {
     }
 
     private static Cluster.Builder withContactPoints(Cluster.Builder builder, CassandraConfig cfg) {
-        for (String contactPoint  : cfg.getContactPoints()) {
-            builder = builder.addContactPoint(contactPoint);
+        Collection<InetSocketAddress> isas = new LinkedList<>();
+        for (InetSocketAddress isa  : cfg.getContactPoints()) {
+            if (isa.getPort() <= 0) isa = new InetSocketAddress(isa.getHostName(), DEFAULT_PORT);
+            isas.add(isa);
         }
+        builder.addContactPointsWithPorts(isas);
         return builder;
     }
 

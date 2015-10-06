@@ -66,6 +66,7 @@ public class EmbededServer {
     private static final String DEFAULT_APP_LOG_LEVEL     = "info";
     private static final String DEFAULT_SRV_LOG_LEVEL     = "warn";
     private static final String DEFAULT_BE_OPTS_CASSANDRA = "{\"contactPoints\":[\"localhost:9042\"]}";
+    private static final String DEFAULT_BE_OPTS_REDIS     = "{\"contactPoints\":[\"localhost:6379\"]}";
 
     @Parameter(names={"-h", "--help"}, description = "display help")
     private boolean help = false;
@@ -79,10 +80,10 @@ public class EmbededServer {
     @Parameter(names={      "--logsrv"}, description = "server log level: debug, info, warn or error; defaults to  " + DEFAULT_SRV_LOG_LEVEL)
     private String rootLogLevel = DEFAULT_SRV_LOG_LEVEL;
 
-    @Parameter(names={      "--be-type"}, description = "backend type; defaults to " + BackendFactory.TYPE_MEMORY + "; cassandra is supported as well and takes a node IP in the --be-endpoint param")
+    @Parameter(names={      "--be-type"}, description = "backend type; defaults to " + BackendFactory.TYPE_MEMORY + "; cassandra and redis-cluster are supported as well (check --be-endpoint)")
     private String beType     = BackendFactory.TYPE_MEMORY;
 
-    @Parameter(names={      "--be-opts"}, description = "backend connectivity options; this depends on the --be-type value. 'memory' backend ignores this argument. 'cassandra' backend reads the cluster IP(s) there.")
+    @Parameter(names={      "--be-opts"}, description = "backend connectivity options; this depends on the --be-type value. 'memory' backend ignores this argument. 'cassandra' backend reads the cluster IP(s) there and options from there (example: '{\"contactPoints\":[\"52.88.93.64\",\"52.89.85.132\",\"52.89.133.153\"], \"authProvider\":{\"type\":\"PlainTextAuthProvider\", \"username\":\"username\", \"password\":\"password\"}, \"loadBalancingPolicy\":{\"type\":\"DCAwareRoundRobinPolicy\", \"localDC\":\"AWS_VPC_US_WEST_2\"}}'; default port is set of left empty). 'redis-cluster reads ips and options from there (example: '{\"contactPoints\":[\"46.101.46.47:6379\",\"46.101.46.48:6379], \"password\":\"secret\"}'; default port is set if left empty).")
     private String beEndpoint = null;
 
     @Parameter(names={      "--slowstart"}, description = "delay (in ms) before the server actually accept any connection, usefull to test that load-balancers are not including the service in pool before it is actually available; disabled by default")
@@ -113,16 +114,6 @@ public class EmbededServer {
         System.setProperty("LOGLEVEL_APP", appLogLevel);
         System.setProperty("LOGLEVEL_SRV", rootLogLevel);
         logger = LoggerFactory.getLogger(EmbededServer.class);
-    }
-
-    private void initLogsFrom(String file) throws JoranException {
-        System.out.println("=============================== " + file);
-        File fn = new File(file);
-        LoggerContext context  = (LoggerContext)LoggerFactory.getILoggerFactory();
-        JoranConfigurator configurator = new JoranConfigurator();
-        configurator.setContext(context);
-        context.reset();
-        configurator.doConfigure(fn);
     }
 
     private void initBackend() {

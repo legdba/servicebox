@@ -21,6 +21,12 @@
 import sys
 import json
 
+class bcolors:
+    MSG  = '\033[36m'
+    MDC  = '\033[39m'
+    LVL  = {'TRACE':'\033[33m', 'DEBUG':'\033[33m', 'INFO':'\033[36m', 'WARN':'\033[35m', 'ERROR':'\033[31m'}
+    ENDC = '\033[0m'
+    
 ###############################################################################
 def display_raw(line):
     sys.stdout.write(line)
@@ -42,7 +48,24 @@ def display_json(line):
     level = j['level']
     host = j['HOSTNAME']
     
-    print "[%s]  %s: %s on %s: %s" %(ts, level, logger, host, msg)
+    filter_out = [\
+                '@timestamp',\
+                '@version',\
+                'message',\
+                'logger_name',\
+                'level',\
+                'HOSTNAME',\
+                'thread_name',\
+                'level_value']
+    props = { key:value for key, value in j.items() if not key in filter_out }
+    
+    if props == {} :
+        props = ''
+    else:
+        props = ' (%s%s%s)' %  (bcolors.MDC, ', '.join("%s='%s'" % (key,val) for (key,val) in props.iteritems()), bcolors.ENDC)
+        
+    print "[%s]  %s%s%s: %s on %s: %s%s%s%s" %(ts, bcolors.LVL[level], level, bcolors.ENDC, logger, host, bcolors.MSG, msg, bcolors.ENDC, props)
+        
     if 'stack_trace' in j:
         stack_trace = j['stack_trace']
         sys.stdout.write(stack_trace)

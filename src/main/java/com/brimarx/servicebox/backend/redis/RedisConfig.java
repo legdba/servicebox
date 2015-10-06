@@ -18,7 +18,7 @@
  # under the License.
  ##############################################################
  */
-package com.brimarx.servicebox.backend.cassandra;
+package com.brimarx.servicebox.backend.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 
-public class CassandraConfig {
+public class RedisConfig {
 
     public Collection<InetSocketAddress> getContactPoints() {
         return contactPoints;
@@ -36,20 +36,12 @@ public class CassandraConfig {
         this.contactPoints = contactPoints;
     }
 
-    public AuthProvider getAuthProvider() {
-        return authProvider;
+    public String getPassword() {
+        return password;
     }
 
-    public void setAuthProvider(AuthProvider authProvider) {
-        this.authProvider = authProvider;
-    }
-
-    public LoadBalancingPolicy getLoadBalancingPolicy() {
-        return loadBalancingPolicy;
-    }
-
-    public void setLoadBalancingPolicy(LoadBalancingPolicy loadBalancingPolicy) {
-        this.loadBalancingPolicy = loadBalancingPolicy;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
@@ -62,6 +54,6 @@ public class CassandraConfig {
     }
 
     private Collection<InetSocketAddress> contactPoints;
-    private AuthProvider authProvider;
-    private LoadBalancingPolicy loadBalancingPolicy;
+
+    private String password;
 }

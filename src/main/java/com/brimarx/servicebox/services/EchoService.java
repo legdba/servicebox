@@ -43,6 +43,17 @@ public class EchoService
         return new Message(message);
     }
 
+    // curl -X POST  -H "Accept: Application/json" -H "Content-Type: application/json" http://localhost:8080/api/v2/echo -d '{"message":"foo"}'
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return back message", notes = "Return back message", response = Message.class)
+    public Message echo(Message message)
+    {
+        logger.info("echo '{}'", message.getMessage());
+        return message;
+    }
+
     @GET
     @Path("/{message}/{delayms : \\d+}")
     @Produces(MediaType.APPLICATION_JSON)

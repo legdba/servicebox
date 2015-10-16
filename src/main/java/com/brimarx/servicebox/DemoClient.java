@@ -26,6 +26,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 
 public class DemoClient {
@@ -33,10 +34,13 @@ public class DemoClient {
         Client client = ClientBuilder.newClient().register(JacksonFeature.class);
         WebTarget api = client.target("http://localhost:8080/api/v2");
         WebTarget echo = api.path("/echo/{message}");
+        WebTarget echo_post = api.path("/echo");
         WebTarget sum = api.path("/calc/sum/{id}/{value}");
 
         System.out.println(echo.resolveTemplate("message", "foo").request().get(Message.class));
         System.out.println(echo.resolveTemplate("message", "bar").request().get(Message.class));
+
+        System.out.println(echo_post.request().post(Entity.json(new Message("foo")), Message.class));
 
         System.out.println(sum.resolveTemplate("id", "1").resolveTemplate("value", 1).request().get(SumResult.class));
         System.out.println(sum.resolveTemplate("id", "1").resolveTemplate("value", 1).request().get(SumResult.class));

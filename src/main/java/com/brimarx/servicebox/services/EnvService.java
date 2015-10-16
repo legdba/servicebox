@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -68,6 +69,20 @@ public class EnvService {
         map.put("hostname", InetAddress.getLocalHost().getHostName());
         logger.info("returning hostname");
         return map;
+    }
+
+    @GET
+    @Path("/pid")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Return JVM PID", notes = "Return JVM PID", response = Message.class)
+    public Message pid() {
+        String jmxCtx = ManagementFactory.getRuntimeMXBean().getName();
+        int offset = jmxCtx.indexOf('@');
+        if (offset > 0) {
+            return new Message(jmxCtx.substring(0, offset));
+        } else {
+            return new Message(jmxCtx);
+        }
     }
 
     private static final Logger logger = LoggerFactory.getLogger(EnvService.class);

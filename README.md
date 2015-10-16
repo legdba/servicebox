@@ -5,6 +5,8 @@
 Toolbox of HTTP services for infra and containers testing:
 * HTTP echo, some with intensive CPU usage and some with delays
 * HTTP service causing Java heap leak
+* HTTP services with high-CPU usage, latency, and doing a sum on a counter using a backend (Redis or Cassandra)
+* HTTP services to return container information (env variables, hostname)
 
 # Usage
 The application runs either as a Java app or as a Docker container.
@@ -58,6 +60,41 @@ To get human readable logs simply pipe the startup command line with "es2txt" ut
 ./gradlew run | ./ls2txt
 ```
 
+Transaction logs are sent to stdout as JSON documents as well:
+- Pure JSON transaction log set with logger 'transaction-logs.json' and JSON attributes for each field (all prefixed with 'txn.')
+- NCSA logs in the message field of the JSON logs and set with logger 'transaction-logs.ncsa'
+
+## Using a Backend
+
+### Memory
+This is the default. No configuration needed.
+
+### Cassandra
+To use cassandra as a backend add the following options:
+```
+--be-type=cassandra --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"]}'
+```
+Plain-text credentials can be set this way (no other credentials supported so far):
+```
+--be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "authProvider":{"type":"PlainTextAuthProvider", "username":"username", "password":"p@ssword"}}'
+```
+Set load balancing policies:
+```
+--be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "loadBalancingPolicy":{"type":"DCAwareRoundRobinPolicy","localDC":"DC_name_"}}'
+```
+
+### Redis-cluster
+To use a redis cluster as a backend add the following options:
+```
+--be-type=redis-cluster --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"]}'
+```
+Plain-text credentials can be set this way:
+```
+--be-type=redis-cluster --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"],"password":"p@ssword"}'
+```
+
+Only redis v3 cluster is supported as of today. Plain old redis instances are not supported.
+
 # Exposed services
 
 Get Swagger definition at http://yourhost:8080/api/v2/swagger.yaml
@@ -66,7 +103,7 @@ Get Swagger-UI at http://yourhost:8080/docs/ (mind the final '/').
 ### GET /api/v2/health
 Returns "{message:'up'}".
 
-###GET /api/v2/health/check/{percentage}
+###GET /api/v2/health/{percentage}
 Returns "{message:'up'}" with {percentage} chance, or fail with an exception. {percentage} is a float number between 0 and 1.
 Usefull for health-checking scripts testing.
 
@@ -89,10 +126,10 @@ Leaks {size} bytes of data on Java heap and returns with a status of leaked and 
 Frees all retained references causing the leak. Nex GC or Full-GC can reclaim associated heap.
 
 ###GET /api/v2/env/vars
-Returns all system environmement variables in a JSON map.
+Returns all system environment variables in a JSON map.
 
 ###GET /api/v2/env/vars/{name}
-Return the value of the system environmement variable {name}.
+Return the value of the system environment variable {name}.
 
 ###GET /api/v2/env/hostname
 Return the value InetAddress.getLocalHost().getHostName() which is usually good enough as a hostname.

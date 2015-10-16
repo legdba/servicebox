@@ -18,8 +18,38 @@
  # under the License.
  ##############################################################
  */
-package com.brimarx.servicebox.backend;
+package com.brimarx.servicebox.backend.cassandra;
 
-public interface Backend {
-    long addAndGet(String id, long value);
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class LoadBalancingPolicy {
+
+    public String getLocalDC() {
+        return localDC;
+    }
+
+    public void setLocalDC(String localDC) {
+        this.localDC = localDC;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private String localDC;
+    private String type;
 }

@@ -5,6 +5,8 @@
 Toolbox of HTTP services for infra and containers testing:
 * HTTP echo, some with intensive CPU usage and some with delays
 * HTTP service causing Java heap leak
+* HTTP services with high-CPU usage, latency, and doing a sum on a counter using a backend (Redis or Cassandra)
+* HTTP services to return container information (env variables, hostname)
 
 # Usage
 The application runs either as a Java app or as a Docker container.

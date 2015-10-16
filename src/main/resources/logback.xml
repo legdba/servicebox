@@ -7,8 +7,12 @@
 
     <logger name="com.brimarx" level="${LOGLEVEL_APP}" />
 
+    <appender name="STDOUT-ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+      <appender-ref ref="STDOUT" />
+    </appender>
+
     <root level="${LOGLEVEL_SRV}">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT-ASYNC" />
     </root>
 
 </configuration>

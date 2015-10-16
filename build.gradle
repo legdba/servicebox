@@ -37,8 +37,9 @@ dependencies {
                 'biz.paluch.redis:lettuce:4.0+',
                 'org.glassfish.jersey.core:jersey-client:2.+' // for JAX-RS client
 
-    testCompile 'org.testng:testng:6.+',
-                'org.uncommons:reportng:1.+'
+    testCompile 'org.testng:testng:6.9.8',
+                'org.uncommons:reportng:1.1.4',
+                'com.google.inject:guice:4.0'
 }
 
 // ensure that test resources (src/test/resources) are added to CLASSPATH;

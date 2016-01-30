@@ -30,13 +30,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/echo")
-@Api(value = "/echo", description = "Echo back received param")
+@Api(value = "/echo", description = "Echo back received param.")
 public class EchoService
 {
     @GET
     @Path("/{message}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return back message", notes = "Return back message", response = Message.class)
+    @ApiOperation(value = "Return back message", notes = "Return back message. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/echo/foo", response = Message.class)
     public Message echo(@PathParam("message") String message)
     {
         logger.info("echo '{}'", message);
@@ -47,7 +47,7 @@ public class EchoService
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return back message", notes = "Return back message", response = Message.class)
+    @ApiOperation(value = "Return back message", notes = "Return back message. Example: curl -i -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d '{\"message\":\"foo\"}'  http://192.168.59.103:8080/api/v2/echo", response = Message.class)
     public Message echo(Message message)
     {
         logger.info("echo '{}'", message.getMessage());
@@ -57,7 +57,7 @@ public class EchoService
     @GET
     @Path("/{message}/{delayms : \\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return back message after {delayms} milliseconds", notes = "Return back message after {delayms} milliseconds", response = Message.class)
+    @ApiOperation(value = "Return back message after {delayms} milliseconds", notes = "Return back message after {delayms} milliseconds. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/echo/foo/1000", response = Message.class)
     public Message delayedEcho(@PathParam("message") String message, @PathParam("delayms") int delayms) throws InterruptedException
     {
         logger.debug("delaying echo by {} ms: {}", delayms, message);

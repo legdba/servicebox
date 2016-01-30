@@ -41,7 +41,7 @@ public class EnvService {
     @GET
     @Path("/vars")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return all server ENV variables", notes = "Return variable as a map of string:string", response = Map.class)
+    @ApiOperation(value = "Return all server ENV variables", notes = "Return variable as a map of string:string. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/env/vars", response = Map.class)
     public Map<String,String> vars() {
         logger.info("returning env");
         return System.getenv();
@@ -50,7 +50,7 @@ public class EnvService {
     @GET
     @Path("/vars/{name}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return the server ENV value for variable {name}", notes = "Return as a map of string:string", response = Map.class)
+    @ApiOperation(value = "Return the server ENV value for variable {name}", notes = "Return as a map of string:string. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/env/vars/HOME", response = Map.class)
     public Map<String,String> var(@PathParam("name") String name) {
         String val = System.getenv().get(name);
         if (val == null) throw new NotFoundException(name);
@@ -63,7 +63,7 @@ public class EnvService {
     @GET
     @Path("/hostname")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return the server hostname", notes = "Return InetAddress.getLocalHost().getHostName() value", response = Map.class)
+    @ApiOperation(value = "Return the server hostname", notes = "Return InetAddress.getLocalHost().getHostName() value which is usually good enough as a hostname. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/env/hostname", response = Map.class)
     public Map<String,String> hostanme() throws UnknownHostException {
         Map<String,String> map = new HashMap<String,String>();
         map.put("hostname", InetAddress.getLocalHost().getHostName());
@@ -74,7 +74,7 @@ public class EnvService {
     @GET
     @Path("/pid")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return JVM PID", notes = "Return JVM PID", response = Message.class)
+    @ApiOperation(value = "Return the JVM PID", notes = "Return JVM PID. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/env/pid", response = Message.class)
     public Message pid() {
         String jmxCtx = ManagementFactory.getRuntimeMXBean().getName();
         int offset = jmxCtx.indexOf('@');

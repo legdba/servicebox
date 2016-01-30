@@ -38,7 +38,7 @@ import java.util.Random;
 public class HealthService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return a 'up' message", notes = "Return a 'up' message", response = Message.class)
+    @ApiOperation(value = "Return a 'up' message", notes = "Return a 'up' message. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/health", response = Message.class)
     public Message check()
     {
         logger.info("health(100%) -> up");
@@ -48,7 +48,7 @@ public class HealthService {
     @GET
     @Path("/{percentage}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Return a 'up' message {percentage}% time", notes = "Return a 'up' message with a {percent}% chance, return an error otherwise", response = Message.class)
+    @ApiOperation(value = "Return a 'up' message {percentage}% time and an HTTP error 503 otherwise. The {percentage} is a float from 0 (0%) to 1 (100%).", notes = "Return a 'up' message with a {percent}% chance, return an error otherwise. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/health/0.5", response = Message.class)
     public Message checkOrFail(@PathParam("percentage") double percentage)
     {
         double f = rand.nextDouble();

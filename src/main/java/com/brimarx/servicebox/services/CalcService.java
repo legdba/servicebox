@@ -43,7 +43,7 @@ public class CalcService {
     @GET
     @Path("sum/{id}/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Statefull sum", notes = "Sum {value} to {id} counter in backend and return the new value", response = SumResult.class)
+    @ApiOperation(value = "Statefull sum", notes = "Sum {value} to {id} counter in and return the new value. The data is stored in the instance memory by defaul( statefull) and can be set to Cassandra or Redis to emulate a stateless 12-factor behavior. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/calc/sum/0/1", response = SumResult.class)
     public SumResult sum(@PathParam("id") String id, @PathParam("value") int value)
     {
         long sum = CalcService.backend.addAndGet(id, value);
@@ -62,7 +62,7 @@ public class CalcService {
     @GET
     @Path("fibo-nth/{n}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Compute the n-th term of fibonacci", notes = "Compute the n-th term of fibonacci which is CPU intensive, expecially if {n} > 50", response = FiboNthResult.class)
+    @ApiOperation(value = "Compute the n-th term of fibonacci", notes = "Compute the n-th term of fibonacci which is CPU intensive, expecially if {n} > 50. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/calc/fibo-nth/42", response = FiboNthResult.class)
     public FiboNthResult calcFiboNthRest(@PathParam("n") long n) {
         if (n > 0) {
             logger.info("calculating fibonacci Nth term for n={}", n);

@@ -39,7 +39,7 @@ public class LeakService {
     @GET
     @Path("/{size}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Leak {size} bytes", notes = "Leak {size} bytes and return the total number of cummulated leaked bytes", response = RetainedHeap.class)
+    @ApiOperation(value = "Leak {size} bytes", notes = "Leak {size} bytes and return the total number of cummulated leaked bytes. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/leak/1024", response = RetainedHeap.class)
     public RetainedHeap leak(@PathParam("size") int size)
     {
         leaks.add(ByteBuffer.allocate(size));
@@ -51,7 +51,7 @@ public class LeakService {
     @GET
     @Path("/free")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Free all leaked references", notes = "All leaked references will be subject to GC", response = RetainedHeap.class)
+    @ApiOperation(value = "Free all leaked references", notes = "All leaked references will be subject to GC. curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/leak/free", response = RetainedHeap.class)
     public RetainedHeap free()
     {
         leaks.clear();

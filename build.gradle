@@ -35,7 +35,9 @@ dependencies {
                 'com.beust:jcommander:1.+',
                 'com.datastax.cassandra:cassandra-driver-core:2.2.+',
                 'biz.paluch.redis:lettuce:4.0+',
-                'org.glassfish.jersey.core:jersey-client:2.+' // for JAX-RS client
+                'org.glassfish.jersey.core:jersey-client:2.+', // for JAX-RS client
+                'io.prometheus:simpleclient_hotspot:0.0.+',
+                'io.prometheus:simpleclient_servlet:0.0.+'
 
     testCompile 'org.testng:testng:6.9.8',
                 'org.uncommons:reportng:1.1.4',

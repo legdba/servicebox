@@ -34,6 +34,11 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
+
 @Path("/calc")
 @Api(value = "/calc", description = "Calculations")
 public class CalcService {
@@ -58,19 +63,46 @@ public class CalcService {
             return 1;
         }
     }
+    
+    static final Gauge fibonth_inprogressRequests = Gauge.build()
+          .name("fibonth__inprogress_requests")
+          .help("Fibo-Nth inprogress requests.").register();
+    static final Histogram fibonth_requestLatency = Histogram.build()
+          .exponentialBuckets(.01, 10, 5)
+          .name("fibonth_latency_seconds")
+          .help("Fibo-Nth request latency in seconds with 0.01, 0.1, 1.0, 10.0 and 100.0 buckets.").register();
+    static final Summary fibonth_requestN = Summary.build()
+          .name("fibonth_n")
+          .help("Fibo-Nth request N values.").register();
+    static final Counter fibonth_requests = Counter.build()
+          .name("fibonth_requests_total")
+          .help("Fibo-Nth requests.").register();
+    static final Counter fibonth_requestFailures = Counter.build()
+          .name("fibonth_requests_failures_total")
+          .help("Fibo-Nth request failures.").register();
 
     @GET
     @Path("fibo-nth/{n}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Compute the n-th term of fibonacci", notes = "Compute the n-th term of fibonacci which is CPU intensive, expecially if {n} > 50. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/calc/fibo-nth/42", response = FiboNthResult.class)
+    @ApiOperation(value = "Compute the n-th term of fibonacci", notes = "Compute the n-th term of fibonacci which is CPU intensive, especially if {n} > 50. Example: curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/calc/fibo-nth/42", response = FiboNthResult.class)
     public FiboNthResult calcFiboNthRest(@PathParam("n") long n) {
-        if (n > 0) {
-            logger.info("calculating fibonacci Nth term for n={}", n);
-            long x  = calcFiboNth(n);
-            logger.info("calculated fibonacci Nth term for n={} : {}", n, x);
-            return new FiboNthResult(n, x);
-        } else {
-            throw new javax.ws.rs.NotAcceptableException("n must be a positive integer");
+        fibonth_inprogressRequests.inc();
+        fibonth_requests.inc();
+        Histogram.Timer requestTimer = fibonth_requestLatency.startTimer();
+        try {
+            if (n > 0) {
+                logger.info("calculating fibonacci Nth term for n={}", n);
+                long x  = calcFiboNth(n);
+                logger.info("calculated fibonacci Nth term for n={} : {}", n, x);
+                return new FiboNthResult(n, x);
+            } else {
+                fibonth_requestFailures.inc();
+                throw new javax.ws.rs.NotAcceptableException("n must be a positive integer");
+            }
+        } finally {
+            fibonth_inprogressRequests.dec();
+            requestTimer.observeDuration();
+            fibonth_requestN.observe(n);
         }
     }
 

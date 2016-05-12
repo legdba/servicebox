@@ -8,6 +8,108 @@ Toolbox of HTTP services for infra and containers testing:
 * HTTP services with high-CPU usage, latency, and doing a sum on a counter using a backend (Redis or Cassandra)
 * HTTP services to return container information (env variables, hostname)
 
+# Exposed REST Services
+
+See full Swagger definition and sample CURL commands at http://yourhost:8080/api/v2/swagger.yaml
+See Swagger-UI at http://yourhost:8080/docs/ (mind the final '/').
+
+## GET /api/v2/echo/{message} or POST /api/v2/echo
+Return back message.
+
+Sample requests (both GET and POST)
+```
+curl -i -H 'Accept: application/json' http://192.168.59.103:8080/api/v2/echo/hello
+curl -X POST  -H "Accept: Application/json" -H "Content-Type: application/json" http://localhost:8080/api/v2/echo -d '{"message":"hello"}'
+```
+
+## GET /api/v2/echo/{message}/{delay}
+Return back message after {delayms} milliseconds
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/echo/hello/1000
+```
+
+## GET /api/v2/env/vars
+Display REST server environment.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/env/vars
+```
+
+## GET /api/v2/env/vars/{name}
+Return the server ENV value for variable {name}.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/env/vars/HOME
+```
+
+## GET /api/v2/env/hostname
+Return the server hostname.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/env/hostname
+```
+
+## GET /api/v2/env/pid
+Return the REST server process ID (PID).
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/env/pid
+```
+
+## GET /api/v2/health
+Health check service.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/health
+```
+
+## GET /api/v2/health/{percentage}
+Return a 'up' message {percentage}% time and an HTTP error 503 otherwise. The {percentage} is a float from 0 (0%) to 1 (100%).
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/health/0.5
+```
+
+## GET /api/v2/leak/{size}
+Leak {size} bytes of memory.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/leak/1024
+```
+
+## GET /api/v2/leak/free
+Free all memory leaked by calls to /api/v2/leak/{size}.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/leak/free
+```
+
+## GET /api/v2/calc/sum/{id}/{value}
+Sum {value} to {id} counter in and return the new value. The data is stored in the instance memory by defaul( statefull) and can be set to Cassandra or Redis to emulate a stateless 12-factor behavior.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/calc/sum/0/1
+```
+
+## GET /api/v2/calc/fibo-nth/{n}
+Compute the n-th term of fibonacci", notes = "Compute the n-th term of fibonacci which is CPU intensive, expecially if {n} > 50.
+
+Sample request:
+```
+curl -i -H 'Accept: application/json' http://localhost:8080/api/v2/calc/fibo-nth/42
+```
+
 # Usage
 The application runs either as a Java app or as a Docker container.
 
@@ -30,7 +132,7 @@ Display help for more details (requires to pass CLI arguments which is not suppo
 ```
 
 ## Docker App
-Latest version is always available in Quai.io and can be used as a docker application:
+Latest version is always available at Quai.io and can be used as a docker application:
 ```
 docker run -ti -p :8080:8080 --rm=true quay.io/legdba/servicebox-jaxrs:latest
 ```
@@ -49,12 +151,12 @@ and commit 'bbb4196'. The associated code can be seen at https://github.com/legd
 or with a 'git bbb4196' command when in the servicebox-jaxrs repo.
 
 # Logs
-Servicebox-jaxrs writes all logs to stdout as one-line logstash default JSON documents
+Servicebox-jaxrs writes all logs to stdout as one-line logstash JSON documents
 (see https://github.com/logstash/logstash-logback-encoder). While this is super convenient for serious deployements
 where a log collector (logstash or another) and ElasticSearch+Kibana is used, this is not human-friendly for basic
 debugging where Kibana is not available or used.
 
-To get human readable logs simply pipe the startup command line with "es2txt" utility (requires python 2.7+).
+To get human readable logs simply pipe the startup command line with "ls2txt" utility (requires python 2.7+).
 
 ```
 ./gradlew run | ./ls2txt
@@ -66,8 +168,10 @@ Transaction logs are sent to stdout as JSON documents as well:
 
 ## Using a Backend
 
+The /api/v2/calc/sum service is statefull and stores it's state in a backend. Memory, Cassandra and Redis backends are supported. Cassandra and Redis are used in a 12-app-factor way.
+
 ### Memory
-This is the default. No configuration needed.
+This is the default. No configuration needed. States are lost upon application stop. Use Cassandra or Redis to externalise state and don't loose them upon stop.
 
 ### Cassandra
 To use cassandra as a backend add the following options:
@@ -118,11 +222,6 @@ Port default to 6379 (default redis port) but can be defined manually like this:
 
 This is using the Lettuce RedisURI syntax.
 For a full list of URI syntax check http://redis.paluch.biz/apidocs/index.html?com/lambdaworks/redis/RedisConnection.html
-
-# Exposed services
-
-See Swagger definition and sample CURL commands at http://yourhost:8080/api/v2/swagger.yaml
-See Swagger-UI at http://yourhost:8080/docs/ (mind the final '/').
 
 # License
 This software is under Apache 2.0 license.

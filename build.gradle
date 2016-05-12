@@ -34,7 +34,7 @@ dependencies {
                 'org.eclipse.jetty:jetty-servlet:9.3.3.v20150827',
                 'com.beust:jcommander:1.+',
                 'com.datastax.cassandra:cassandra-driver-core:2.2.+',
-                'biz.paluch.redis:lettuce:4.0+',
+                'biz.paluch.redis:lettuce:4.1+',
                 'org.glassfish.jersey.core:jersey-client:2.+' // for JAX-RS client
 
     testCompile 'org.testng:testng:6.9.8',

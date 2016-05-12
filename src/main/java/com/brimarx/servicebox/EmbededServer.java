@@ -21,7 +21,6 @@
 package com.brimarx.servicebox;
 
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 import com.beust.jcommander.JCommander;
@@ -43,7 +42,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.URISyntaxException;
 
 public class EmbededServer {
@@ -65,8 +63,6 @@ public class EmbededServer {
     private static final int    DEFAULT_HTTP_PORT         = 8080;
     private static final String DEFAULT_APP_LOG_LEVEL     = "info";
     private static final String DEFAULT_SRV_LOG_LEVEL     = "warn";
-    private static final String DEFAULT_BE_OPTS_CASSANDRA = "{\"contactPoints\":[\"localhost:9042\"]}";
-    private static final String DEFAULT_BE_OPTS_REDIS     = "{\"contactPoints\":[\"localhost:6379\"]}";
 
     @Parameter(names={"-h", "--help"}, description = "display help")
     private boolean help = false;
@@ -80,10 +76,10 @@ public class EmbededServer {
     @Parameter(names={      "--logsrv"}, description = "server log level: debug, info, warn or error; defaults to  " + DEFAULT_SRV_LOG_LEVEL)
     private String rootLogLevel = DEFAULT_SRV_LOG_LEVEL;
 
-    @Parameter(names={      "--be-type"}, description = "backend type; defaults to " + BackendFactory.TYPE_MEMORY + "; cassandra and redis-cluster are supported as well (check --be-endpoint)")
+    @Parameter(names={      "--be-type"}, description = "backend type; defaults to " + BackendFactory.TYPE_MEMORY + "; " + BackendFactory.TYPE_CASSANDRA + ", " + BackendFactory.DEFAULT_BE_OPTS_REDIS_SENTINEL +  " and " + BackendFactory.TYPE_REDISCLUSTER + " are supported as well (check --be-opts)")
     private String beType     = BackendFactory.TYPE_MEMORY;
 
-    @Parameter(names={      "--be-opts"}, description = "backend connectivity options; this depends on the --be-type value. 'memory' backend ignores this argument. 'cassandra' backend reads the cluster IP(s) there and options from there (example: '{\"contactPoints\":[\"52.88.93.64\",\"52.89.85.132\",\"52.89.133.153\"], \"authProvider\":{\"type\":\"PlainTextAuthProvider\", \"username\":\"username\", \"password\":\"password\"}, \"loadBalancingPolicy\":{\"type\":\"DCAwareRoundRobinPolicy\", \"localDC\":\"AWS_VPC_US_WEST_2\"}}'; default port is set of left empty). 'redis-cluster reads ips and options from there (example: '{\"contactPoints\":[\"46.101.46.47:6379\",\"46.101.46.48:6379\"], \"password\":\"secret\"}'; default port is set if left empty).")
+    @Parameter(names={      "--be-opts"}, description = "backend connectivity options; this depends on the --be-type value. '" + BackendFactory.TYPE_MEMORY + "' backend ignores this argument. '" + BackendFactory.TYPE_CASSANDRA + "' backend reads the cluster IP(s) there and options from there (example: '{\"contactPoints\":[\"52.88.93.64\",\"52.89.85.132\",\"52.89.133.153\"], \"authProvider\":{\"type\":\"PlainTextAuthProvider\", \"username\":\"username\", \"password\":\"password\"}, \"loadBalancingPolicy\":{\"type\":\"DCAwareRoundRobinPolicy\", \"localDC\":\"AWS_VPC_US_WEST_2\"}}'; default port is set of left empty). '" + BackendFactory.TYPE_REDISSENTINEL + "' reads it's configuration from a Lettuce RedisURI (example: redis-sentinel://password@sentinel1,sentinel2,sentinel3#mymaster). '" + BackendFactory.TYPE_REDISCLUSTER + "' reads it's configuration from a Lettuce RedisURI (example: redis://password@node1,node2,node3).")
     private String beEndpoint = null;
 
     @Parameter(names={      "--slowstart"}, description = "delay (in ms) before the server actually accept any connection, usefull to test that load-balancers are not including the service in pool before it is actually available; disabled by default")
@@ -92,7 +88,7 @@ public class EmbededServer {
     private void run() {
         try {
             initLogs();
-            logger.info("logs initialized");
+            logger.info("log system initialized");
             logger.debug("debug enabled");
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -106,7 +102,7 @@ public class EmbededServer {
             runJettyAndWait();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            System.exit(2);
+            System.exit(3);
         }
     }
 
@@ -114,10 +110,24 @@ public class EmbededServer {
         System.setProperty("LOGLEVEL_APP", appLogLevel);
         System.setProperty("LOGLEVEL_SRV", rootLogLevel);
         logger = LoggerFactory.getLogger(EmbededServer.class);
+
+        // Need to setup a shutdown hook to force Logback to flush all logs.
+        // Otherwise any JVM exist on exception within the main loop can cause some logs to be lost
+        // The 50ms wait is to give the possiblity to background threads to stop and logs as when
+        // the LoggerContext.stop() has been called no more logs can be writted.
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                }
+                ((LoggerContext)LoggerFactory.getILoggerFactory()).stop();
+            }
+        });
     }
 
     private void initBackend() {
-        if (BackendFactory.TYPE_CASSANDRA.equalsIgnoreCase(beType) && (beEndpoint == null || beEndpoint.trim().isEmpty())) beEndpoint= DEFAULT_BE_OPTS_CASSANDRA;
         CalcService.setBackend(BackendFactory.build(beType, beEndpoint));
     }
 

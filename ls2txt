@@ -40,18 +40,20 @@ def display_json(line):
     :param line: the line to parse as a json document
     """
     j = json.loads(line)
-    
+
     ts = j['@timestamp']
     ver = j['@version']
-    msg = j['message']
+    msg = j.get('message', '')
+    stack_trace = j.get('stack_trace', None)
     logger = j['logger_name']
     level = j['level']
     host = j['HOSTNAME']
-    
+
     filter_out = [\
                 '@timestamp',\
                 '@version',\
                 'message',\
+                'stack_trace',\
                 'logger_name',\
                 'level',\
                 'HOSTNAME',\
@@ -66,8 +68,7 @@ def display_json(line):
         
     print "[%s]  %s%s%s: %s on %s: %s%s%s%s" %(ts, bcolors.LVL[level], level, bcolors.ENDC, logger, host, bcolors.MSG, msg, bcolors.ENDC, props)
         
-    if 'stack_trace' in j:
-        stack_trace = j['stack_trace']
+    if stack_trace:
         sys.stdout.write(stack_trace)
     
 ###############################################################################

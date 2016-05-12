@@ -21,20 +21,24 @@
 package com.brimarx.servicebox.backend.redis;
 
 import com.brimarx.servicebox.backend.Backend;
+import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.RedisSentinelAsyncConnection;
 import com.lambdaworks.redis.RedisURI;
+import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
 import com.lambdaworks.redis.cluster.api.StatefulRedisClusterConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
-public class RedisClusterBackend implements Backend {
+public class RedisSentinelBackend implements Backend {
 
-    public RedisClusterBackend(String cfg) {
+    public RedisSentinelBackend(String cfg) {
         logger.info("connecting to {}", cfg);
-        cluster = RedisClusterClient.create(cfg);
-        cnx = cluster.connect();
+        redisClient = RedisClient.create(cfg);
+        cnx = redisClient.connect();
 
         logger.info("testing backend with a sum('0', 0) request...");
         addAndGet("0", 0);
@@ -49,8 +53,8 @@ public class RedisClusterBackend implements Backend {
         return newValue;
     }
 
-    private RedisClusterClient cluster;
-    private StatefulRedisClusterConnection<String,String> cnx;
+    private RedisClient redisClient;
+    private StatefulRedisConnection<String, String> cnx;
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisClusterBackend.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisSentinelBackend.class);
 }

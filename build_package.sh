@@ -35,7 +35,7 @@ usage: [options] --type=(npm|gradle-disttar) --app-name=NAME --pkg-dir=DIR\n\
 \n\
 Mandatory Parameters:\n\
   --type=TYPE           Build manager type, used to select the packaging\n\
-                        mechanism; shall be any of (npm|gradle-farjar)\n\
+                        mechanism; shall be any of (npm|gradle-disttar)\n\
 \n\
                         TYPE='npm'\n\
                         Packaging a npm application to a '{APP_NAME}.tgz'\n\
@@ -48,18 +48,13 @@ Mandatory Parameters:\n\
                         - application source dir must be the basedir of the\n\
                           package.json 'main' property\n\
 \n\
-                        TYPE='gradle-farjar'\n\
-                        Packaging a gradle fatJar application to a\n\
-                        '{APP_NAME}.tgz' which ocntains only the fat jar\n\
-                        renamed to '{APP_NAME}.jar' and without sub dir.
+                        TYPE='gradle-disttar'\n\
+                        Packaging a gradle application to a\n\
+                        '{APP_NAME}.tgz' which ocntains only all jars.
 \n\
                         REQUIREMENTS:\n\
                         - current dir must be the gradlew script dir\n\
                         - current dir must be the build.gradle script dir\n\
-                        - 'gradlew fatJAr' command must build the fat jar and\n\
-                           outputs a 'fatjar: {filename}' line\n\
-                        - the fat jar must be generated in ./build/libs (this\n\
-                          is the default in gradle)\n\
 \n\
   --app-name=APP_NAME   Name used for package generation; exact package name.\n\
 \n\

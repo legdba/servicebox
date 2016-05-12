@@ -83,17 +83,41 @@ Set load balancing policies:
 --be-type cassandra --be-opts '{"contactPoints":["52.88.93.64","52.89.85.132","52.89.133.153"], "loadBalancingPolicy":{"type":"DCAwareRoundRobinPolicy","localDC":"DC_name_"}}'
 ```
 
-### Redis-cluster
-To use a redis cluster as a backend add the following options:
+### Redis-sentinel
+To use a redis sentinel as a backend add the following options listing at least one of the sentinel nodes (ideally 2
+minimum, could be more):
 ```
---be-type=redis-cluster --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"]}'
+--be-type redis-sentinel --be-opts redis-sentinel://sentinel1,sentinel2,sentinel3#mymaster
 ```
 Plain-text credentials can be set this way:
 ```
---be-type=redis-cluster --be-opts='{"contactPoints":["46.101.16.49","178.62.87.192"],"password":"p@ssword"}'
+--be-type redis-sentinel --be-opts redis-sentinel://password@sentinel1,sentinel2,sentinel3#mymaster
+```
+Port default to 26379 (default sentinel port) but can be defined manually like this:
+```
+--be-type redis-sentinel --be-opts redis-sentinel://sentinel1:5000,sentinel2:6000,sentinel3:7000#mymaster
 ```
 
-Only redis v3 cluster is supported as of today. Plain old redis instances are not supported.
+This is using the Lettuce RedisURI syntax.
+For a full list of URI syntax check http://redis.paluch.biz/apidocs/index.html?com/lambdaworks/redis/RedisConnection.html
+
+### Redis-cluster
+To use a redis cluster as a backend add the following options listing at least one of the cluster nodes (ideally 2
+minimum, could be more):
+```
+--be-type=redis-cluster --be-opts=redis://redis1,redis2,redis3
+```
+Plain-text credentials can be set this way:
+```
+--be-type=redis-cluster --be-opts=redis://password@redis1,redis2,redis3
+```
+Port default to 6379 (default redis port) but can be defined manually like this:
+```
+--be-type=redis-cluster --be-opts=redis://redis1:5000,redis2:6000,redis3:7000
+```
+
+This is using the Lettuce RedisURI syntax.
+For a full list of URI syntax check http://redis.paluch.biz/apidocs/index.html?com/lambdaworks/redis/RedisConnection.html
 
 # Exposed services
 

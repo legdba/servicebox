@@ -23,20 +23,26 @@ package com.brimarx.servicebox.backend;
 import com.brimarx.servicebox.backend.cassandra.CassandraBackend;
 import com.brimarx.servicebox.backend.cassandra.CassandraConfig;
 import com.brimarx.servicebox.backend.redis.RedisClusterBackend;
-import com.brimarx.servicebox.backend.redis.RedisConfig;
+import com.brimarx.servicebox.backend.redis.RedisSentinelBackend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
 public class BackendFactory {
-    public static final String TYPE_MEMORY       = "memory";
-    public static final String TYPE_CASSANDRA    = "cassandra";
-    public static final String TYPE_REDISCLUSTER = "redis-cluster";
+    public static final String TYPE_MEMORY        = "memory";
+    public static final String TYPE_CASSANDRA     = "cassandra";
+    public static final String TYPE_REDISCLUSTER  = "redis-cluster";
+    public static final String TYPE_REDISSENTINEL = "redis-sentinel";
+
+    public static final String DEFAULT_BE_OPTS_CASSANDRA = "{\"contactPoints\":[\"localhost:9042\"]}";
+    public static final String DEFAULT_BE_OPTS_REDIS_CLUSTER = "redis://localhost:6379";
+    public static final String DEFAULT_BE_OPTS_REDIS_SENTINEL = "redis-sentinel://localhost:6379?sentinelMasterId=mymaster";
 
     public static Backend build(String type, String connectivity) {
         if      (TYPE_MEMORY.equalsIgnoreCase(type)) return buildMemory();
         else if (TYPE_CASSANDRA.equalsIgnoreCase(type)) return buildCassandra(connectivity);
         else if (TYPE_REDISCLUSTER.equalsIgnoreCase(type)) return buildRedisCluster(connectivity);
+        else if (TYPE_REDISSENTINEL.equalsIgnoreCase(type)) return buildRedisSentinel(connectivity);
         throw new IllegalArgumentException("invalid backend type: " + type);
     }
 
@@ -46,21 +52,22 @@ public class BackendFactory {
 
     private static Backend buildCassandra(String connectivity) {
         try {
+            if (connectivity == null || connectivity.trim().isEmpty()) connectivity = DEFAULT_BE_OPTS_CASSANDRA;
             ObjectMapper om = new ObjectMapper();
             CassandraConfig cfg = om.readValue(connectivity, CassandraConfig.class);
             return new CassandraBackend(cfg);
         } catch (IOException e) {
-            throw new IllegalArgumentException("invalid be connectivity '" + connectivity + "' : " + e, e);
+            throw new IllegalArgumentException("invalid backend connectivity '" + connectivity + "' : " + e, e);
         }
     }
 
     private static Backend buildRedisCluster(String connectivity) {
-        try {
-            ObjectMapper om = new ObjectMapper();
-            RedisConfig cfg = om.readValue(connectivity, RedisConfig.class);
-            return new RedisClusterBackend(cfg);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("invalid be connectivity '" + connectivity + "' : " + e, e);
-        }
+        if (connectivity == null || connectivity.trim().isEmpty()) connectivity = DEFAULT_BE_OPTS_REDIS_CLUSTER;
+        return new RedisClusterBackend(connectivity);
+    }
+
+    private static Backend buildRedisSentinel(String connectivity) {
+        if (connectivity == null || connectivity.trim().isEmpty()) connectivity = DEFAULT_BE_OPTS_REDIS_SENTINEL;
+        return new RedisSentinelBackend(connectivity);
     }
 }

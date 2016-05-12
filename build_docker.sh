@@ -23,15 +23,13 @@
 # This script MUST be run from the git repo of the application.
 #
 # Requirements for the application building:
-# - The application shall either be a standard npm application or gradle
-#   uber-jar artifact
+# - The application shall either be a standard npm application or standard
+#   gradle application
 # - NPM requirements:
 #   - Shall have a standar package.json file at the repo root with
 #     - a main property set to the application main JS file
 # - Gradle requirements:
-#   - Shall have gradlew script at the repo root with
-#     - A 'fatJar' target building a single uber jar and outputing the jar name
-#       to stdout with the following format: "fatJar : {filename}"
+#   - Shall have gradlew script at the repo root
 #
 # Requirements for the Dockerfile.in
 # - use the following tokens for substitution with the associated variables:

@@ -166,6 +166,26 @@ Transaction logs are sent to stdout as JSON documents as well:
 - Pure JSON transaction log set with logger 'transaction-logs.json' and JSON attributes for each field (all prefixed with 'txn.')
 - NCSA logs in the message field of the JSON logs and set with logger 'transaction-logs.ncsa'
 
+# Metrics
+Servicebox-jaxrs generated Prometheus(http://www.prometheus.io/) metrics for the Fibo-Nth service as a showcase.
+The following metrics are generated:
+- fibonth__inprogress_requests (Gauge): Fibo-Nth inprogress requests.
+- fibonth_latency_seconds (Histogram): Fibo-Nth request latency in seconds with 0.01, 0.1, 1.0, 10.0 and 100.0 buckets.
+- fibonth_n (Summary): Fibo-Nth request N values.
+- fibonth_requests_total (Counter): Fibo-Nth requests.
+- fibonth_requests_failures_total (Counter): Fibo-Nth request failures.
+
+This uses all type of Prometheus data collectors.
+
+Add the following lines to your Prometheus scrape_configs section (prometheus.yml file):
+```
+  - job_name: "servicebox-jaxrs"
+    scrape_interval: 5s
+    target_groups:
+    - targets:
+        - "localhost:8080"
+```
+
 ## Using a Backend
 
 The /api/v2/calc/sum service is statefull and stores it's state in a backend. Memory, Cassandra and Redis backends are supported. Cassandra and Redis are used in a 12-app-factor way.
@@ -222,6 +242,9 @@ Port default to 6379 (default redis port) but can be defined manually like this:
 
 This is using the Lettuce RedisURI syntax.
 For a full list of URI syntax check http://redis.paluch.biz/apidocs/index.html?com/lambdaworks/redis/RedisConnection.html
+
+Prometheus metrics are exposed on http://yourhost:8080/metrics
+See Prometheus section above for the list of generated metrics.
 
 # License
 This software is under Apache 2.0 license.

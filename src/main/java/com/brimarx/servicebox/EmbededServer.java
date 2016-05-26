@@ -42,6 +42,9 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.exporter.MetricsServlet;
+import io.prometheus.client.hotspot.StandardExports;
+
 import java.net.URISyntaxException;
 
 public class EmbededServer {
@@ -144,6 +147,7 @@ public class EmbededServer {
         HandlerList handlers = new HandlerList();
         handlers.addHandler(buildSwaggerUI());
         handlers.addHandler(buildContext());
+        handlers.addHandler(buildPrometheus());
         handlers.addHandler(new DefaultHandler());
         server.setHandler(handlers);
 
@@ -206,6 +210,15 @@ public class EmbededServer {
         entityBrowserContext.setContextPath("/api/v2");
         entityBrowserContext.addServlet(sh, "/*");
         return entityBrowserContext;
+    }
+    
+    private ContextHandler buildPrometheus()
+    {
+        ServletContextHandler context = new ServletContextHandler();
+        context.setContextPath("/");
+        server.setHandler(context);
+        context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics");
+        return context;
     }
 
     private ContextHandler buildSwaggerUI()

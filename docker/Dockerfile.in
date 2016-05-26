@@ -25,7 +25,7 @@
 # docker run -ti --rm -p 80:8080 quay.io/legdba/httpecho:[tag] --help
 #
 ##############################################################
-FROM quay.io/legdba/javaw:openjdk-8u91-jdk
+FROM quay.io/legdba/javaw:java-8u92-jdk
 MAINTAINER Vincent Bourdaraud <vincent@bourdaraud.com>
 
 # Prepare for service
